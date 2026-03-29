@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Holdwise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0A0F1E;
+      --bg-card: #111827;
+      --border: rgba(255,255,255,0.08);
+      --text: #FFFFFF;
+      --text-muted: rgba(255,255,255,0.5);
+      --accent: #1A56DB;
+      --cyan: #00D4FF;
+      --green: #28C840;
+      --red: #FF5555;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-font-smoothing: antialiased;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    body.loaded { opacity: 1; }
+    body.fade-out { opacity: 0; transition: opacity 0.25s ease; }
+
+    .login-container { width: 100%; max-width: 420px; padding: 20px; }
+    .login-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 32px;
+      animation: slideUp 0.5s ease both;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      justify-content: center; margin-bottom: 32px; text-decoration: none;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--cyan), var(--accent));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 900; color: #fff;
+    }
+    .logo-text { font-size: 20px; font-weight: 700; color: var(--text); }
+    .tabs {
+      display: flex; margin-bottom: 28px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px; padding: 4px;
+    }
+    .tab {
+      flex: 1; padding: 10px; text-align: center;
+      font-size: 14px; font-weight: 600;
+      color: var(--text-muted); background: none;
+      border: none; border-radius: 8px;
+      cursor: pointer; transition: all 0.25s;
+      font-family: inherit;
+    }
+    .tab.active { background: var(--accent); color: #fff; }
+    .tab:hover:not(.active) { color: var(--text); }
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block; font-size: 13px; font-weight: 500;
+      color: var(--text-muted); margin-bottom: 6px;
+    }
+    .form-group input {
+      width: 100%; padding: 12px 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text);
+      font-size: 14px; font-family: inherit;
+      outline: none; transition: border-color 0.2s;
+    }
+    .form-group input:focus { border-color: var(--accent); }
+    .form-group input::placeholder { color: var(--text-muted); }
+    .btn-submit {
+      width: 100%; padding: 13px;
+      background: var(--accent); color: #fff;
+      font-size: 15px; font-weight: 600;
+      border: none; border-radius: 10px;
+      cursor: pointer; font-family: inherit;
+      transition: opacity 0.2s, transform 0.15s;
+      margin-top: 6px;
+    }
+    .btn-submit:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn-submit:active { transform: translateY(0); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .back-link {
+      display: block; text-align: center; margin-top: 24px;
+      color: var(--text-muted); font-size: 13px;
+      text-decoration: none; transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--text); }
+
+    /* Toast */
+    .toast-container {
+      position: fixed; top: 24px; right: 24px;
+      z-index: 1000; display: flex; flex-direction: column; gap: 8px;
+    }
+    .toast {
+      padding: 14px 20px; border-radius: 10px;
+      font-size: 13px; font-weight: 500;
+      backdrop-filter: blur(12px);
+      animation: toastIn 0.35s ease both;
+      max-width: 360px;
+    }
+    .toast.error {
+      background: rgba(255,85,85,0.15);
+      border: 1px solid rgba(255,85,85,0.3);
+      color: #FF5555;
+    }
+    .toast.success {
+      background: rgba(40,200,64,0.15);
+      border: 1px solid rgba(40,200,64,0.3);
+      color: #28C840;
+    }
+    .toast.fade-out { animation: toastOut 0.3s ease both; }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes toastOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(40px); } }
+
+    /* Signup-only fields transition */
+    .signup-only { overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease; margin-bottom: 0; }
+    .signup-only.visible { max-height: 100px; opacity: 1; margin-bottom: 18px; }
+  </style>
+</head>
+<body>
+  <div class="toast-container" id="toast-container"></div>
+  <div class="login-container">
+    <div class="login-card">
+      <a href="/" class="logo">
+        <div class="logo-icon">H</div>
+        <span class="logo-text">Holdwise</span>
+      </a>
+
+      <div class="tabs">
+        <button class="tab active" id="tab-login" onclick="switchTab('login')">Log In</button>
+        <button class="tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+      </div>
+
+      <form id="auth-form" onsubmit="handleAuth(event)">
+        <div class="form-group signup-only" id="name-group">
+          <label for="fullname">Full Name</label>
+          <input type="text" id="fullname" placeholder="John Doe" />
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="you@company.com" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter your password" required minlength="6" />
+        </div>
+        <div class="form-group signup-only" id="confirm-group">
+          <label for="password-confirm">Confirm Password</label>
+          <input type="password" id="password-confirm" placeholder="Confirm your password" minlength="6" />
+        </div>
+        <button type="submit" class="btn-submit" id="submit-btn">Log In</button>
+      </form>
+
+      <a href="/" class="back-link">Back to homepage</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    let mode = 'login';
+    const SUPABASE_URL = 'https://vsmiguhndgjmygbxhage.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzbWlndWhuZGdqbXlnYnhoYWdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MDY2NTYsImV4cCI6MjA5MDM4MjY1Nn0.xhPxYmIxBdJu856e63WQna_fQTC1FRqILZcuctemIpo';
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Auth guard — redirect to dashboard if already logged in
+    (async function() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) { navigateTo('/dashboard'); return; }
+      document.body.classList.add('loaded');
+    })();
+
+    function navigateTo(url) {
+      document.body.classList.add('fade-out');
+      setTimeout(() => { window.location.href = url; }, 250);
+    }
+
+    // Toast notifications
+    function showToast(msg, type) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = msg;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    function switchTab(tab) {
+      mode = tab;
+      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+      document.getElementById('submit-btn').textContent = tab === 'login' ? 'Log In' : 'Create Account';
+      document.querySelectorAll('.signup-only').forEach(el => {
+        el.classList.toggle('visible', tab === 'signup');
+      });
+      document.getElementById('fullname').required = tab === 'signup';
+      document.getElementById('password-confirm').required = tab === 'signup';
+    }
+
+    async function handleAuth(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('submit-btn');
+
+      if (mode === 'signup') {
+        const fullname = document.getElementById('fullname').value.trim();
+        const confirmPw = document.getElementById('password-confirm').value;
+        if (!fullname) { showToast('Please enter your name.', 'error'); return; }
+        if (password !== confirmPw) { showToast('Passwords do not match.', 'error'); return; }
+      }
+
+      btn.disabled = true;
+      btn.textContent = mode === 'login' ? 'Logging in...' : 'Creating account...';
+
+      try {
+        let result;
+        if (mode === 'login') {
+          result = await sb.auth.signInWithPassword({ email, password });
+        } else {
+          const fullname = document.getElementById('fullname').value.trim();
+          result = await sb.auth.signUp({
+            email, password,
+            options: { data: { full_name: fullname } }
+          });
+        }
+
+        if (result.error) {
+          showToast(result.error.message, 'error');
+        } else if (mode === 'signup') {
+          if (result.data?.user?.identities?.length === 0) {
+            showToast('This email is already registered. Try logging in.', 'error');
+          } else if (result.data?.user && !result.data?.session) {
+            // Email verification required — do NOT auto-login
+            showToast('Account created! Check your email to verify, then log in.', 'success');
+            switchTab('login');
+          } else if (result.data?.session) {
+            // Email verification disabled in Supabase — session granted immediately
+            showToast('Account created! Redirecting...', 'success');
+            setTimeout(() => navigateTo('/dashboard'), 600);
+          }
+        } else {
+          showToast('Logged in! Redirecting...', 'success');
+          setTimeout(() => navigateTo('/dashboard'), 600);
+        }
+      } catch (err) {
+        showToast('Something went wrong. Please try again.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = mode === 'login' ? 'Log In' : 'Create Account';
+      }
+    }
+  </script>
+</body>
+</html>

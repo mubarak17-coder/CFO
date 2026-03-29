@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Holdwise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0A0F1E;
+      --bg-card: #111827;
+      --border: rgba(255,255,255,0.08);
+      --text: #FFFFFF;
+      --text-muted: rgba(255,255,255,0.5);
+      --accent: #1A56DB;
+      --cyan: #00D4FF;
+      --green: #28C840;
+      --red: #FF5555;
+      --yellow: #FFB800;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    body.loaded { opacity: 1; }
+    body.fade-out { opacity: 0; transition: opacity 0.25s ease; }
+
+    /* Navbar */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--cyan), var(--accent));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 900; color: #fff;
+    }
+    .logo-text { font-size: 17px; font-weight: 700; color: var(--text); }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .btn-ghost {
+      color: var(--text-muted); font-size: 13px; font-weight: 500;
+      text-decoration: none; padding: 7px 14px; border-radius: 8px;
+      background: none; border: none; cursor: pointer;
+      font-family: inherit; transition: color 0.2s, background 0.2s;
+    }
+    .btn-ghost:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+
+    /* Main */
+    .main { padding: 88px 24px 40px; max-width: 1100px; margin: 0 auto; }
+    .page-title { font-size: 24px; font-weight: 700; margin-bottom: 24px; }
+
+    /* Grid */
+    .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 24px;
+      transition: border-color 0.2s;
+    }
+    .card:hover { border-color: rgba(255,255,255,0.12); }
+    .card-label { font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 8px; }
+    .card-value { font-size: 28px; font-weight: 700; }
+    .card-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    /* Premium balance card */
+    .card-balance {
+      background: linear-gradient(135deg, #111827 0%, rgba(26,86,219,0.08) 100%);
+      border-color: rgba(26,86,219,0.2);
+    }
+    .card-balance .card-value {
+      background: linear-gradient(135deg, var(--text), var(--cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Two-column */
+    .two-col { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 24px; }
+    @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* Transactions */
+    .card-title {
+      font-size: 16px; font-weight: 600; margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .tx-scroll { max-height: 520px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; }
+    .tx-scroll::-webkit-scrollbar { width: 4px; }
+    .tx-scroll::-webkit-scrollbar-track { background: transparent; }
+    .tx-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+    .tx-list { list-style: none; }
+    .tx-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    .tx-item:last-child { border-bottom: none; }
+    .tx-left { display: flex; flex-direction: column; gap: 2px; }
+    .tx-merchant { font-size: 14px; font-weight: 500; }
+    .tx-meta { font-size: 12px; color: var(--text-muted); }
+    .tx-amount { font-size: 14px; font-weight: 600; white-space: nowrap; }
+    .tx-amount.negative { color: var(--red); }
+    .tx-amount.positive { color: var(--green); }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
+
+    /* Category chart */
+    .cat-bar-group { margin-bottom: 14px; }
+    .cat-bar-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
+    .cat-bar-label span:first-child { font-weight: 500; }
+    .cat-bar-label span:last-child { color: var(--text-muted); }
+    .cat-bar-track { height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+    .cat-bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+
+    /* Lockbox */
+    .lockbox-section { margin-bottom: 24px; }
+    .lockbox-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; }
+    .lockbox-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .lockbox-amounts { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
+    .lockbox-current { font-size: 28px; font-weight: 700; color: var(--green); }
+    .lockbox-goal { font-size: 14px; color: var(--text-muted); }
+    .progress-track { height: 10px; background: rgba(255,255,255,0.06); border-radius: 5px; overflow: hidden; margin-bottom: 8px; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--cyan)); border-radius: 5px; transition: width 0.5s ease; }
+    .progress-label { font-size: 12px; color: var(--text-muted); text-align: right; }
+    .lockbox-actions { display: flex; gap: 10px; margin-top: 16px; }
+    .lockbox-input {
+      flex: 1; padding: 10px 14px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-size: 14px; font-family: inherit; outline: none;
+    }
+    .lockbox-input:focus { border-color: var(--accent); }
+
+    /* Buttons */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff;
+      font-size: 14px; font-weight: 600;
+      padding: 10px 20px; border-radius: 8px;
+      border: none; cursor: pointer; font-family: inherit;
+      transition: opacity 0.2s, transform 0.15s;
+      text-decoration: none;
+    }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-sm { padding: 8px 16px; font-size: 13px; }
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: none; color: var(--accent);
+      font-size: 13px; font-weight: 600;
+      padding: 8px 16px; border-radius: 8px;
+      border: 1px solid var(--accent);
+      cursor: pointer; font-family: inherit; transition: background 0.2s;
+    }
+    .btn-outline:hover { background: rgba(26,86,219,0.1); }
+
+    /* Connect banner */
+    .connect-banner {
+      background: linear-gradient(135deg, rgba(26,86,219,0.15), rgba(0,212,255,0.08));
+      border: 1px solid rgba(26,86,219,0.3);
+      border-radius: 14px; padding: 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .connect-banner-text h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+    .connect-banner-text p { font-size: 13px; color: var(--text-muted); }
+    @media (max-width: 768px) {
+      .connect-banner { flex-direction: column; gap: 16px; text-align: center; }
+    }
+
+    /* Show more button */
+    .btn-show-more {
+      display: block; width: 100%; margin-top: 12px;
+      padding: 10px; text-align: center;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px; color: var(--accent);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-show-more:hover { background: rgba(26,86,219,0.1); border-color: var(--accent); }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block; width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Skeleton loading */
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .skeleton-value { height: 32px; width: 140px; margin-bottom: 4px; }
+    .skeleton-sub { height: 14px; width: 100px; }
+    .skeleton-tx { height: 48px; width: 100%; margin-bottom: 12px; border-radius: 8px; }
+
+    /* Toast */
+    .toast-container {
+      position: fixed; top: 24px; right: 24px;
+      z-index: 1000; display: flex; flex-direction: column; gap: 8px;
+    }
+    .toast {
+      padding: 14px 20px; border-radius: 10px;
+      font-size: 13px; font-weight: 500;
+      backdrop-filter: blur(12px);
+      animation: toastIn 0.35s ease both;
+      max-width: 360px;
+    }
+    .toast.error { background: rgba(255,85,85,0.15); border: 1px solid rgba(255,85,85,0.3); color: #FF5555; }
+    .toast.success { background: rgba(40,200,64,0.15); border: 1px solid rgba(40,200,64,0.3); color: #28C840; }
+    .toast.info { background: rgba(26,86,219,0.15); border: 1px solid rgba(26,86,219,0.3); color: var(--cyan); }
+    .toast.fade-out { animation: toastOut 0.3s ease both; }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateX(40px); } }
+  </style>
+</head>
+<body>
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="/" class="logo">
+      <div class="logo-icon">H</div>
+      <span class="logo-text">Holdwise</span>
+    </a>
+    <div class="nav-right">
+      <button class="btn-ghost" onclick="navigateTo('/')">Home</button>
+      <button class="btn-ghost" id="logout-btn" onclick="handleLogout()">Log Out</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <h1 class="page-title">Dashboard</h1>
+
+    <!-- Connect Bank Banner -->
+    <div class="connect-banner" id="connect-banner">
+      <div class="connect-banner-text">
+        <h3>Connect your bank account</h3>
+        <p>Link your bank to see balances, transactions, and spending insights.</p>
+      </div>
+      <button class="btn-primary" id="connect-btn" onclick="connectBank()">Connect Bank</button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid">
+      <div class="card card-balance">
+        <div class="card-label">Total Balance</div>
+        <div id="total-balance"><div class="skeleton skeleton-value"></div></div>
+        <div id="accounts-count"><div class="skeleton skeleton-sub"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Monthly Spending</div>
+        <div id="monthly-spending"><div class="skeleton skeleton-value"></div></div>
+        <div class="card-sub">Last 30 days</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Transactions</div>
+        <div id="tx-count"><div class="skeleton skeleton-value"></div></div>
+        <div class="card-sub">Last 30 days</div>
+      </div>
+    </div>
+
+    <!-- Transactions + Categories -->
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">
+          <span>Recent Transactions</span>
+          <span id="tx-showing" style="font-size:12px;color:var(--text-muted);font-weight:400;"></span>
+        </div>
+        <div id="tx-list">
+          <div class="skeleton skeleton-tx"></div>
+          <div class="skeleton skeleton-tx"></div>
+          <div class="skeleton skeleton-tx"></div>
+          <div class="skeleton skeleton-tx"></div>
+          <div class="skeleton skeleton-tx"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Spending by Category</div>
+        <div id="cat-chart">
+          <div class="skeleton skeleton-tx"></div>
+          <div class="skeleton skeleton-tx"></div>
+          <div class="skeleton skeleton-tx"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Savings Lockbox -->
+    <div class="lockbox-section">
+      <div class="lockbox-card">
+        <div class="lockbox-header">
+          <div class="card-title" style="margin-bottom:0;">Savings Lockbox</div>
+          <button class="btn-outline btn-sm" onclick="editGoal()">Edit Goal</button>
+        </div>
+        <div class="lockbox-amounts">
+          <span class="lockbox-current" id="lockbox-current">$0.00</span>
+          <span class="lockbox-goal" id="lockbox-goal">of $5,000.00 goal</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="lockbox-progress" style="width: 0%"></div>
+        </div>
+        <div class="progress-label" id="lockbox-percent">0% reached</div>
+        <div class="lockbox-actions">
+          <input type="number" class="lockbox-input" id="lockbox-amount" placeholder="Amount to save" min="0" step="0.01" />
+          <button class="btn-primary btn-sm" onclick="addToLockbox()">Add Savings</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://vsmiguhndgjmygbxhage.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzbWlndWhuZGdqbXlnYnhoYWdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MDY2NTYsImV4cCI6MjA5MDM4MjY1Nn0.xhPxYmIxBdJu856e63WQna_fQTC1FRqILZcuctemIpo';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Auth guard
+    (async function() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) { window.location.href = '/login'; return; }
+      document.body.classList.add('loaded');
+    })();
+
+    function navigateTo(url) {
+      document.body.classList.add('fade-out');
+      setTimeout(() => { window.location.href = url; }, 250);
+    }
+  </script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CFO — Finance Tracker for Startups</title>
+  <title>Holdwise — Smart Savings for Students</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -16,7 +16,7 @@
       --border:     rgba(255,255,255,0.08);
       --text:       #FFFFFF;
       --text-muted: rgba(255,255,255,0.5);
-      --accent:     #4A90E2;
+      --accent:     #1A56DB;
       --cyan:       #00D4FF;
       --green:      #28C840;
       --red:        #FF5555;
@@ -28,7 +28,7 @@
       --border:     rgba(0,0,0,0.08);
       --text:       #0D1B3E;
       --text-muted: rgba(13,27,62,0.5);
-      --accent:     #2E75B6;
+      --accent:     #1A56DB;
       --cyan:       #1A6FC7;
       color-scheme: light;
     }
@@ -492,6 +492,11 @@
       transition: opacity 0.55s ease, transform 0.55s ease;
     }
     [data-reveal].visible { opacity: 1; transform: translateY(0); }
+
+    /* Page fade */
+    body { opacity: 0; transition: opacity 0.4s ease, background 0.3s, color 0.3s; }
+    body.loaded { opacity: 1; }
+    body.fade-out { opacity: 0; transition: opacity 0.25s ease; }
   </style>
 </head>
 <body>
@@ -499,16 +504,16 @@
 <!-- Navbar -->
 <nav class="navbar">
   <a href="#hero" class="logo">
-    <div class="logo-icon">$</div>
-    <span class="logo-text">CFO</span>
+    <div class="logo-icon">H</div>
+    <span class="logo-text">Holdwise</span>
   </a>
   <ul class="nav-links">
     <li><a href="#features">Features</a></li>
     <li><a href="#cta">Demo</a></li>
   </ul>
   <div class="nav-actions">
-    <a href="#" class="btn-ghost">Login</a>
-    <a href="#cta" class="btn-primary">Get Started →</a>
+    <a href="/login" class="btn-ghost">Login</a>
+    <a href="/login" class="btn-primary">Get Started →</a>
   </div>
 </nav>
 
@@ -518,19 +523,18 @@
     <div class="hero-left">
       <div class="badge">
         <span class="badge-dot"></span>
-        CFO Finance Tracker · v1.0 · 2026
+        Holdwise · v1.0 · 2026
       </div>
 
       <h1 class="headline">Take Full Control<br/>of Your Finances.</h1>
 
       <p class="subheadline">
-        The <strong>CFO-grade tracker</strong> for startups: track income &amp; expenses,
+        The <strong>smart savings app</strong> for students: track income &amp; expenses,
         manage savings goals, and compare budget vs actual — all in one place.
       </p>
 
       <div class="hero-cta">
-        <a href="https://cal.com/yerassyl-mubarak-gmwlle/cfo" target="_blank" rel="noopener"
-           class="btn-primary btn-lg">Book Demo →</a>
+        <a href="/login" class="btn-primary btn-lg">Get Started →</a>
         <a href="#features" class="btn-outline">See Features</a>
       </div>
       <p class="cta-note">No credit card required · Setup in 2 minutes</p>
@@ -617,16 +621,16 @@
 <!-- Features -->
 <section class="features" id="features">
   <div class="section-eyebrow" data-reveal>Core Features</div>
-  <h2 class="section-title" data-reveal>Everything a CFO Needs.</h2>
+  <h2 class="section-title" data-reveal>Everything You Need.</h2>
 
   <div class="feat-grid">
     <div class="feat-card glow-card" data-reveal style="--hue:220">
       <div class="feat-icon feat-icon-1">
         <svg viewBox="0 0 24 24" fill="none">
-          <rect x="3" y="14" width="3.5" height="7" rx="1" fill="#4A90E2"/>
-          <rect x="8.5" y="9" width="3.5" height="12" rx="1" fill="#4A90E2" opacity="0.7"/>
-          <rect x="14" y="5" width="3.5" height="16" rx="1" fill="#4A90E2" opacity="0.5"/>
-          <rect x="19.5" y="2" width="3.5" height="19" rx="1" fill="#4A90E2" opacity="0.3"/>
+          <rect x="3" y="14" width="3.5" height="7" rx="1" fill="#1A56DB"/>
+          <rect x="8.5" y="9" width="3.5" height="12" rx="1" fill="#1A56DB" opacity="0.7"/>
+          <rect x="14" y="5" width="3.5" height="16" rx="1" fill="#1A56DB" opacity="0.5"/>
+          <rect x="19.5" y="2" width="3.5" height="19" rx="1" fill="#1A56DB" opacity="0.3"/>
           <polyline points="3,15 8.5,10 14,6 23,3" stroke="#00D4FF" stroke-width="1.5"
             stroke-linecap="round" stroke-linejoin="round" fill="none"/>
           <circle cx="23" cy="3" r="1.5" fill="#00D4FF"/>
@@ -686,12 +690,10 @@
   <div class="cta-inner">
     <div class="section-eyebrow" data-reveal>Get Started Today</div>
     <h2 class="cta-title" data-reveal>Ready to grow<br/>your savings?</h2>
-    <p class="cta-sub" data-reveal>Built for startup CFOs who need real control over income, expenses, savings, and budget variance.</p>
+    <p class="cta-sub" data-reveal>Built for students who need real control over income, expenses, savings, and budget goals.</p>
     <div class="cta-btns" data-reveal>
-      <a href="https://cal.com/yerassyl-mubarak-gmwlle/cfo" target="_blank" rel="noopener"
-         class="btn-primary btn-lg">Get Started Free →</a>
-      <a href="https://cal.com/yerassyl-mubarak-gmwlle/cfo" target="_blank" rel="noopener"
-         class="btn-outline">See Demo</a>
+      <a href="/login" class="btn-primary btn-lg">Get Started Free →</a>
+      <a href="#features" class="btn-outline">See Features</a>
     </div>
     <p class="cta-note" data-reveal>No credit card required · Free forever on the starter plan</p>
   </div>
@@ -700,10 +702,10 @@
 <!-- Footer -->
 <footer class="footer">
   <a href="#hero" class="footer-logo">
-    <div class="footer-logo-icon">$</div>
-    <span class="footer-logo-text">CFO</span>
+    <div class="footer-logo-icon">H</div>
+    <span class="footer-logo-text">Holdwise</span>
   </a>
-  <span class="footer-copy">© 2026 CFO Inc. All rights reserved.</span>
+  <span class="footer-copy">© 2026 Holdwise Inc. All rights reserved.</span>
   <nav class="footer-links">
     <a href="#">Privacy</a>
     <a href="#">Terms</a>
@@ -732,12 +734,35 @@
   </svg>
 </button>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  /* Auth guard — redirect logged-in users to dashboard */
+  (async function() {
+    try {
+      const sb = window.supabase.createClient(
+        'https://vsmiguhndgjmygbxhage.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzbWlndWhuZGdqbXlnYnhoYWdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MDY2NTYsImV4cCI6MjA5MDM4MjY1Nn0.xhPxYmIxBdJu856e63WQna_fQTC1FRqILZcuctemIpo'
+      );
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) { navigateTo('/dashboard'); return; }
+    } catch(e) {}
+    document.body.classList.add('loaded');
+  })();
+
+  /* Smooth navigation */
+  function navigateTo(url) {
+    document.body.classList.add('fade-out');
+    setTimeout(() => { window.location.href = url; }, 250);
+  }
+  document.querySelectorAll('a[href="/login"]').forEach(a => {
+    a.addEventListener('click', e => { e.preventDefault(); navigateTo('/login'); });
+  });
+
   /* Theme */
   (function() {
     const body = document.body;
     const btn  = document.getElementById('themeToggle');
-    const STORAGE = 'cfo-theme';
+    const STORAGE = 'holdwise-theme';
 
     function apply(theme) {
       body.classList.toggle('light', theme === 'light');
