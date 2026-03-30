@@ -1,12 +1,6 @@
 {
   "rewrites": [
     { "source": "/login", "destination": "/login.html" },
-    { "source": "/dashboard", "destination": "/dashboard.html" },
-    { "source": "/api/(.*)", "destination": "/api/$1" }
-  ],
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "@vercel/node@3"
-    }
-  }
+    { "source": "/dashboard", "destination": "/dashboard.html" }
+  ]
 }
