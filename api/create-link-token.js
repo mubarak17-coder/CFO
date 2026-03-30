@@ -23,6 +23,7 @@ module.exports = async function handler(req, res) {
     });
     res.json({ link_token: response.data.link_token });
   } catch (error) {
+    console.error('Plaid linkTokenCreate error:', error?.response?.data || error.message);
     res.status(500).json({ error: 'Failed to create link token' });
   }
 };
