@@ -14,13 +14,20 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const response = await plaidClient.linkTokenCreate({
+    const request = {
       user: { client_user_id: user.id },
       client_name: 'Holdwise',
       products: [Products.Transactions],
-      country_codes: [CountryCode.Us],
-      language: 'en',
-    });
+      country_codes: [CountryCode.De],
+      language: 'de',
+      link_customization_name: 'holdwise',
+    };
+
+    if (process.env.PLAID_REDIRECT_URI) {
+      request.redirect_uri = process.env.PLAID_REDIRECT_URI;
+    }
+
+    const response = await plaidClient.linkTokenCreate(request);
     res.json({ link_token: response.data.link_token });
   } catch (error) {
     const detail = error?.response?.data || { message: error.message, stack: error.stack?.split('\n').slice(0, 3) };

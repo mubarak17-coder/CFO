@@ -9,15 +9,40 @@ module.exports = async function handler(req, res) {
   if (!user) return res.status(401).json({ error: 'Authentication required' });
 
   try {
-    const accessToken = user.user_metadata?.plaid_access_token;
-    if (!accessToken) {
+    // Fetch all linked banks for this user
+    const { data: items, error: dbError } = await supabase
+      .from('plaid_items')
+      .select('access_token, institution_name')
+      .eq('user_id', user.id);
+
+    if (dbError) {
+      console.error('Supabase query error:', dbError);
+      return res.status(500).json({ error: 'Failed to fetch linked accounts' });
+    }
+
+    if (!items || items.length === 0) {
       return res.json({ accounts: [], total_balance: 0 });
     }
-    const response = await plaidClient.accountsBalanceGet({ access_token: accessToken });
-    const accounts = response.data.accounts;
+
+    // Fetch balances from all linked banks in parallel
+    const results = await Promise.allSettled(
+      items.map(async (item) => {
+        const response = await plaidClient.accountsBalanceGet({ access_token: item.access_token });
+        return response.data.accounts.map(a => ({
+          ...a,
+          institution_name: item.institution_name,
+        }));
+      })
+    );
+
+    const accounts = results
+      .filter(r => r.status === 'fulfilled')
+      .flatMap(r => r.value);
     const total_balance = accounts.reduce((sum, a) => sum + (a.balances.current || 0), 0);
+
     res.json({ accounts, total_balance });
   } catch (error) {
+    console.error('Balances fetch error:', error);
     res.status(500).json({ error: 'Failed to fetch balances' });
   }
 };

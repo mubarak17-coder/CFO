@@ -91,8 +91,6 @@ const plaidConfig = new Configuration({
 });
 const plaidClient = new PlaidApi(plaidConfig);
 
-// --- Per-user token storage (use a database in production) ---
-const userTokens = new Map(); // key: user.id, value: { accessToken, itemId }
 
 // --- Static files (exclude protected pages) ---
 app.use(express.static(path.join(__dirname), {
@@ -111,16 +109,25 @@ app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'dashboard
 // Rate-limited: max 5 requests per minute per IP for token creation
 app.post('/api/create-link-token', requireAuth, rateLimiter(10, 60000), async (req, res) => {
   try {
-    const response = await plaidClient.linkTokenCreate({
+    const request = {
       user: { client_user_id: req.user.id },
       client_name: 'Holdwise',
       products: [Products.Transactions],
-      country_codes: [CountryCode.Us],
-      language: 'en',
-    });
+      country_codes: [CountryCode.De],
+      language: 'de',
+      link_customization_name: 'holdwise',
+    };
+
+    if (process.env.PLAID_REDIRECT_URI) {
+      request.redirect_uri = process.env.PLAID_REDIRECT_URI;
+    }
+
+    const response = await plaidClient.linkTokenCreate(request);
     res.json({ link_token: response.data.link_token });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create link token' });
+    const detail = error?.response?.data || { message: error.message };
+    console.error('Plaid linkTokenCreate error:', JSON.stringify(detail));
+    res.status(500).json({ error: 'Failed to create link token', detail });
   }
 });
 
@@ -131,25 +138,62 @@ app.post('/api/exchange-token', requireAuth, rateLimiter(5, 60000), async (req, 
       return res.status(400).json({ error: 'Invalid public_token' });
     }
     const response = await plaidClient.itemPublicTokenExchange({ public_token });
-    // Store per user, not globally
-    userTokens.set(req.user.id, {
-      accessToken: response.data.access_token,
-      itemId: response.data.item_id,
-    });
-    res.json({ success: true });
+    const { access_token, item_id } = response.data;
+
+    // Fetch institution name for display
+    let institution_name = null;
+    try {
+      const itemResponse = await plaidClient.itemGet({ access_token });
+      const instId = itemResponse.data.item.institution_id;
+      if (instId) {
+        const instResponse = await plaidClient.institutionsGetById({
+          institution_id: instId,
+          country_codes: ['DE'],
+        });
+        institution_name = instResponse.data.institution.name;
+      }
+    } catch (_) { /* non-critical */ }
+
+    // Upsert into plaid_items table (supports multiple banks per user)
+    const { error: dbError } = await supabase
+      .from('plaid_items')
+      .upsert({
+        user_id: req.user.id,
+        item_id,
+        access_token,
+        institution_name,
+      }, { onConflict: 'item_id' });
+
+    if (dbError) {
+      console.error('Supabase upsert error:', dbError);
+      return res.status(500).json({ error: 'Failed to store bank connection' });
+    }
+
+    res.json({ success: true, institution_name });
   } catch (error) {
+    console.error('Exchange token error:', error?.response?.data || error.message);
     res.status(500).json({ error: 'Failed to exchange token' });
   }
 });
 
 app.get('/api/balances', requireAuth, async (req, res) => {
   try {
-    const tokens = userTokens.get(req.user.id);
-    if (!tokens) {
-      return res.json({ accounts: [], total_balance: 0 });
-    }
-    const response = await plaidClient.accountsBalanceGet({ access_token: tokens.accessToken });
-    const accounts = response.data.accounts;
+    const { data: items, error: dbError } = await supabase
+      .from('plaid_items')
+      .select('access_token, institution_name')
+      .eq('user_id', req.user.id);
+
+    if (dbError) return res.status(500).json({ error: 'Failed to fetch linked accounts' });
+    if (!items || items.length === 0) return res.json({ accounts: [], total_balance: 0 });
+
+    const results = await Promise.allSettled(
+      items.map(async (item) => {
+        const response = await plaidClient.accountsBalanceGet({ access_token: item.access_token });
+        return response.data.accounts.map(a => ({ ...a, institution_name: item.institution_name }));
+      })
+    );
+
+    const accounts = results.filter(r => r.status === 'fulfilled').flatMap(r => r.value);
     const total_balance = accounts.reduce((sum, a) => sum + (a.balances.current || 0), 0);
     res.json({ accounts, total_balance });
   } catch (error) {
@@ -159,33 +203,51 @@ app.get('/api/balances', requireAuth, async (req, res) => {
 
 app.get('/api/transactions', requireAuth, async (req, res) => {
   try {
-    const tokens = userTokens.get(req.user.id);
-    if (!tokens) {
-      return res.json({ transactions: [] });
-    }
+    const { data: items, error: dbError } = await supabase
+      .from('plaid_items')
+      .select('access_token, institution_name')
+      .eq('user_id', req.user.id);
+
+    if (dbError) return res.status(500).json({ error: 'Failed to fetch linked accounts' });
+    if (!items || items.length === 0) return res.json({ transactions: [] });
+
     const now = new Date();
     const thirtyDaysAgo = new Date(now);
     thirtyDaysAgo.setDate(now.getDate() - 30);
+    const startDate = thirtyDaysAgo.toISOString().split('T')[0];
+    const endDate = now.toISOString().split('T')[0];
 
-    let attempts = 0;
-    while (attempts < 5) {
-      try {
-        const response = await plaidClient.transactionsGet({
-          access_token: tokens.accessToken,
-          start_date: thirtyDaysAgo.toISOString().split('T')[0],
-          end_date: now.toISOString().split('T')[0],
-          options: { count: 50, offset: 0 },
-        });
-        return res.json({ transactions: response.data.transactions });
-      } catch (e) {
-        if (e.response?.data?.error_code === 'PRODUCT_NOT_READY' && attempts < 4) {
-          attempts++;
-          await new Promise(r => setTimeout(r, 2000));
-        } else {
-          throw e;
+    const results = await Promise.allSettled(
+      items.map(async (item) => {
+        let attempts = 0;
+        while (attempts < 5) {
+          try {
+            const response = await plaidClient.transactionsGet({
+              access_token: item.access_token,
+              start_date: startDate,
+              end_date: endDate,
+              options: { count: 100, offset: 0 },
+            });
+            return response.data.transactions.map(t => ({ ...t, institution_name: item.institution_name }));
+          } catch (e) {
+            if (e.response?.data?.error_code === 'PRODUCT_NOT_READY' && attempts < 4) {
+              attempts++;
+              await new Promise(r => setTimeout(r, 2000));
+            } else {
+              throw e;
+            }
+          }
         }
-      }
-    }
+        return [];
+      })
+    );
+
+    const transactions = results
+      .filter(r => r.status === 'fulfilled')
+      .flatMap(r => r.value)
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    res.json({ transactions });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch transactions' });
   }
