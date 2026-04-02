@@ -149,7 +149,7 @@ async function connectBank() {
           body: JSON.stringify({ public_token: publicToken }),
         });
         bankConnected = true;
-        document.getElementById('connect-banner').style.display = 'none';
+        showToast('Bank connected successfully!', 'success');
         loadDashboardData();
       },
       onExit: () => {
@@ -192,8 +192,9 @@ function renderBalances(data) {
     count > 0 ? `${count} account${count > 1 ? 's' : ''} connected` : 'No accounts connected';
 
   if (count > 0) {
-    document.getElementById('connect-banner').style.display = 'none';
     bankConnected = true;
+    document.getElementById('connect-title').textContent = 'Add another bank';
+    document.getElementById('connect-desc').textContent = `${count} account${count > 1 ? 's' : ''} connected. Link more banks to see all your finances in one place.`;
   }
 }
 
