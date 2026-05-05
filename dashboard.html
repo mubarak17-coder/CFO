@@ -6,25 +6,29 @@
   <title>Dashboard — Holdwise</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
     :root {
-      --bg: #0A0F1E;
-      --bg-card: #111827;
-      --bg-sidebar: #0F1F3D;
-      --border: rgba(255,255,255,0.08);
-      --text: #FFFFFF;
-      --text-muted: rgba(255,255,255,0.5);
-      --accent: #1A56DB;
-      --cyan: #00D4FF;
-      --green: #28C840;
-      --red: #FF5555;
-      --yellow: #FFB800;
-      --sidebar-w: 240px;
+      --bg: #08090E;
+      --bg-card: #0D1117;
+      --bg-sidebar: #09111F;
+      --text: #F1F5F9;
+      --text-sub: rgba(241,245,249,0.45);
+      --text-dim: rgba(241,245,249,0.22);
+      --accent: #3B82F6;
+      --accent-glow: rgba(59,130,246,0.14);
+      --mint: #10D9A0;
+      --rose: #F43F5E;
+      --sidebar-w: 232px;
+      --r: 16px;
+      --r-sm: 10px;
+      --card-shadow: 0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
     }
+
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter', -apple-system, sans-serif;
       background: var(--bg);
       color: var(--text);
       -webkit-font-smoothing: antialiased;
@@ -40,261 +44,328 @@
       position: fixed; top: 0; left: 0; bottom: 0;
       width: var(--sidebar-w);
       background: var(--bg-sidebar);
-      border-right: 1px solid var(--border);
       display: flex; flex-direction: column;
       z-index: 100;
-      transition: transform 0.3s ease;
+      box-shadow: 1px 0 0 rgba(255,255,255,0.04);
     }
     .sidebar-logo {
       display: flex; align-items: center; gap: 10px;
-      padding: 24px 20px 32px;
+      padding: 28px 20px 32px;
       text-decoration: none;
     }
-    .sidebar-logo .logo-icon {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, var(--cyan), var(--accent));
-      border-radius: 10px;
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--accent), #1D4ED8);
+      border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 16px; font-weight: 900; color: #fff;
+      font-size: 13px; font-weight: 800; color: #fff;
       flex-shrink: 0;
     }
-    .sidebar-logo .logo-text {
-      font-size: 18px; font-weight: 700; color: var(--text);
-    }
+    .logo-text { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
 
-    .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 0 12px; }
+    .sidebar-nav { flex: 1; padding: 0 10px; display: flex; flex-direction: column; gap: 2px; }
     .nav-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 14px; border-radius: 10px;
-      color: var(--text-muted); font-size: 14px; font-weight: 500;
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: var(--r-sm);
+      color: var(--text-sub); font-size: 13px; font-weight: 500;
       text-decoration: none; cursor: pointer;
       border: none; background: none; font-family: inherit;
       width: 100%; text-align: left;
-      transition: color 0.2s, background 0.2s;
+      transition: color 0.15s, background 0.15s;
     }
-    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-    .nav-item.active {
-      color: #fff;
-      background: var(--accent);
-    }
-    .nav-item .nav-icon { font-size: 18px; width: 24px; text-align: center; line-height: 1; }
-    .nav-item .nav-label { white-space: nowrap; }
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+    .nav-item.active { color: var(--text); background: rgba(59,130,246,0.1); }
+    .nav-item.active .nav-svg { color: var(--accent); }
+    .nav-svg { width: 16px; height: 16px; flex-shrink: 0; color: inherit; }
+    .nav-label { white-space: nowrap; }
 
     .sidebar-bottom {
-      padding: 16px 12px 24px;
-      border-top: 1px solid var(--border);
-      margin-top: auto;
+      padding: 12px 10px 24px;
+      border-top: 1px solid rgba(255,255,255,0.04);
     }
-    .nav-item.logout { color: var(--red); }
-    .nav-item.logout:hover { background: rgba(255,85,85,0.1); }
+    .user-pill {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: var(--r-sm);
+      margin-bottom: 4px; overflow: hidden;
+    }
+    .user-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--mint));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .user-name { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-email { font-size: 11px; color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .nav-item.logout { color: rgba(244,63,94,0.65); }
+    .nav-item.logout:hover { color: var(--rose); background: rgba(244,63,94,0.07); }
 
-    /* ── Content Area ── */
-    .content {
+    /* ── Main ── */
+    .main {
       margin-left: var(--sidebar-w);
-      padding: 32px 32px 40px;
-      max-width: calc(1100px + var(--sidebar-w));
+      padding: 44px 52px 72px;
       min-height: 100vh;
     }
-    .page-title { font-size: 24px; font-weight: 700; margin-bottom: 24px; }
-
-    /* ── Grid ── */
-    .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-
-    /* ── Cards ── */
-    .card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 14px; padding: 24px;
-      transition: border-color 0.2s;
-    }
-    .card:hover { border-color: rgba(255,255,255,0.12); }
-    .card-label { font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 8px; }
-    .card-value { font-size: 28px; font-weight: 700; }
-    .card-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-
-    .card-balance {
-      background: linear-gradient(135deg, #111827 0%, rgba(26,86,219,0.08) 100%);
-      border-color: rgba(26,86,219,0.2);
-    }
-    .card-balance .card-value {
-      background: linear-gradient(135deg, var(--text), var(--cyan));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    /* ── Two-column ── */
-    .two-col { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 24px; }
-
-    /* ── Transactions ── */
-    .card-title {
-      font-size: 16px; font-weight: 600; margin-bottom: 16px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .tx-scroll { max-height: 520px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; }
-    .tx-scroll::-webkit-scrollbar { width: 4px; }
-    .tx-scroll::-webkit-scrollbar-track { background: transparent; }
-    .tx-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-    .tx-list { list-style: none; }
-    .tx-item {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 0; border-bottom: 1px solid var(--border);
-      transition: background 0.15s;
-    }
-    .tx-item:last-child { border-bottom: none; }
-    .tx-left { display: flex; flex-direction: column; gap: 2px; }
-    .tx-merchant { font-size: 14px; font-weight: 500; }
-    .tx-meta { font-size: 12px; color: var(--text-muted); }
-    .tx-amount { font-size: 14px; font-weight: 600; white-space: nowrap; }
-    .tx-amount.negative { color: var(--red); }
-    .tx-amount.positive { color: var(--green); }
-    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
-
-    /* ── Category chart ── */
-    .cat-bar-group { margin-bottom: 14px; }
-    .cat-bar-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
-    .cat-bar-label span:first-child { font-weight: 500; }
-    .cat-bar-label span:last-child { color: var(--text-muted); }
-    .cat-bar-track { height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
-    .cat-bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
-
-    /* ── Lockbox (overview) ── */
-    .lockbox-section { margin-bottom: 24px; }
-    .lockbox-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; }
-    .lockbox-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .lockbox-amounts { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
-    .lockbox-current { font-size: 28px; font-weight: 700; color: var(--green); }
-    .lockbox-goal { font-size: 14px; color: var(--text-muted); }
-    .progress-track { height: 10px; background: rgba(255,255,255,0.06); border-radius: 5px; overflow: hidden; margin-bottom: 8px; }
-    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--cyan)); border-radius: 5px; transition: width 0.5s ease; }
-    .progress-label { font-size: 12px; color: var(--text-muted); text-align: right; }
-    .lockbox-actions { display: flex; gap: 10px; margin-top: 16px; }
-    .lockbox-input {
-      flex: 1; padding: 10px 14px;
-      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-      border-radius: 8px; color: var(--text); font-size: 14px; font-family: inherit; outline: none;
-    }
-    .lockbox-input:focus { border-color: var(--accent); }
-
-    /* ── Buttons ── */
-    .btn-primary {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: var(--accent); color: #fff;
-      font-size: 14px; font-weight: 600;
-      padding: 10px 20px; border-radius: 8px;
-      border: none; cursor: pointer; font-family: inherit;
-      transition: opacity 0.2s, transform 0.15s;
-      text-decoration: none;
-    }
-    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
-    .btn-primary:active { transform: translateY(0); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .btn-sm { padding: 8px 16px; font-size: 13px; }
-    .btn-outline {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: none; color: var(--accent);
-      font-size: 13px; font-weight: 600;
-      padding: 8px 16px; border-radius: 8px;
-      border: 1px solid var(--accent);
-      cursor: pointer; font-family: inherit; transition: background 0.2s;
-    }
-    .btn-outline:hover { background: rgba(26,86,219,0.1); }
-
-    /* ── Connect banner ── */
-    .connect-banner {
-      background: linear-gradient(135deg, rgba(26,86,219,0.15), rgba(0,212,255,0.08));
-      border: 1px solid rgba(26,86,219,0.3);
-      border-radius: 14px; padding: 24px;
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 24px;
-    }
-    .connect-banner-text h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
-    .connect-banner-text p { font-size: 13px; color: var(--text-muted); }
-
-    /* ── Show more ── */
-    .btn-show-more {
-      display: block; width: 100%; margin-top: 12px;
-      padding: 10px; text-align: center;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 8px; color: var(--accent);
-      font-size: 13px; font-weight: 600;
-      cursor: pointer; font-family: inherit;
-      transition: background 0.2s, border-color 0.2s;
-    }
-    .btn-show-more:hover { background: rgba(26,86,219,0.1); border-color: var(--accent); }
-
-    /* ── Spinner ── */
-    .spinner {
-      display: inline-block; width: 18px; height: 18px;
-      border: 2px solid rgba(255,255,255,0.2);
-      border-top-color: var(--accent); border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ── Skeleton ── */
     .skeleton {
-      background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
       background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-      border-radius: 6px;
+      animation: shimmer 1.8s ease infinite;
     }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-    .skeleton-value { height: 32px; width: 140px; margin-bottom: 4px; }
-    .skeleton-sub { height: 14px; width: 100px; }
-    .skeleton-tx { height: 48px; width: 100%; margin-bottom: 12px; border-radius: 8px; }
+    .sk-line { border-radius: 6px; }
+
+    .hidden { display: none !important; }
+
+    /* ── Empty State ── */
+    .empty-hero {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; min-height: 72vh;
+      text-align: center; padding: 40px 20px;
+      animation: fadeUp 0.6s ease both;
+    }
+    .empty-illo { margin-bottom: 44px; }
+    .empty-hero h2 {
+      font-size: 28px; font-weight: 700; letter-spacing: -0.6px;
+      line-height: 1.3; margin-bottom: 14px;
+    }
+    .empty-hero p {
+      font-size: 15px; color: var(--text-sub);
+      max-width: 400px; line-height: 1.65; margin-bottom: 36px;
+    }
+    .btn-connect-hero {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--accent); color: #fff;
+      font-size: 14.5px; font-weight: 600; padding: 14px 28px;
+      border-radius: 12px; border: none; cursor: pointer;
+      font-family: inherit; letter-spacing: -0.1px;
+      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 8px 28px rgba(59,130,246,0.28);
+    }
+    .btn-connect-hero:hover { opacity: 0.92; transform: translateY(-2px); box-shadow: 0 12px 36px rgba(59,130,246,0.38); }
+    .btn-connect-hero:active { transform: none; }
+    .btn-connect-hero:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .empty-trust { margin-top: 18px; font-size: 11px; color: var(--text-dim); letter-spacing: 0.03em; }
+
+    /* ── Page header ── */
+    .page-header { margin-bottom: 36px; }
+    .greeting { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.2; }
+    .greeting-sub { font-size: 13px; color: var(--text-sub); margin-top: 5px; }
+
+    /* ── Eyebrow / section labels ── */
+    .eyebrow {
+      font-size: 10px; font-weight: 600; color: var(--text-dim);
+      text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 3px;
+    }
+    .section-title { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; }
+
+    /* ── Hero layout ── */
+    .hero-section {
+      display: grid; grid-template-columns: 300px 1fr;
+      gap: 20px; align-items: start; margin-bottom: 20px;
+    }
+
+    /* ── Donut card ── */
+    .donut-card {
+      background: var(--bg-card);
+      border-radius: var(--r); padding: 32px 28px;
+      box-shadow: var(--card-shadow);
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .donut-svg-wrap {
+      position: relative; width: 200px; height: 200px; margin-bottom: 20px;
+    }
+    .donut-svg-wrap svg { width: 100%; height: 100%; overflow: visible; display: block; }
+    .donut-center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      pointer-events: none; transition: opacity 0.15s;
+    }
+    .donut-center-label { font-size: 9.5px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; }
+    .donut-center-value { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; margin-top: 3px; font-variant-numeric: tabular-nums; }
+    .donut-hover {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      pointer-events: none; opacity: 0; transition: opacity 0.15s;
+    }
+    .donut-hover.vis { opacity: 1; }
+    .hov-name { font-size: 11px; color: var(--text-sub); }
+    .hov-val { font-size: 18px; font-weight: 700; letter-spacing: -0.4px; margin-top: 2px; }
+    .hov-pct { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+    .donut-legend { display: flex; flex-wrap: wrap; gap: 8px 14px; justify-content: center; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--text-sub); }
+    .legend-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Accounts card ── */
+    .accounts-card {
+      background: var(--bg-card);
+      border-radius: var(--r); padding: 28px 32px;
+      box-shadow: var(--card-shadow);
+    }
+    .accounts-card-header { margin-bottom: 20px; }
+    .acct-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 13px 0;
+    }
+    .acct-row + .acct-row { border-top: 1px solid rgba(255,255,255,0.04); }
+    .acct-left { display: flex; align-items: center; gap: 12px; }
+    .acct-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .acct-name { font-size: 13.5px; font-weight: 500; }
+    .acct-type { font-size: 11px; color: var(--text-sub); margin-top: 1px; }
+    .acct-bal { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .acct-total {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 16px; margin-top: 4px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .acct-total-label { font-size: 12px; color: var(--text-sub); font-weight: 500; }
+    .acct-total-val {
+      font-size: 20px; font-weight: 700; letter-spacing: -0.5px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Drain section ── */
+    .drain-card {
+      background: var(--bg-card);
+      border-radius: var(--r); padding: 28px 32px;
+      box-shadow: var(--card-shadow); margin-bottom: 20px;
+    }
+    .drain-header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .drain-total-label { font-size: 12.5px; color: var(--text-sub); }
+    .drain-total-val { font-size: 13px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+    .drain-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .drain-item {
+      background: rgba(255,255,255,0.025);
+      border-radius: 12px; padding: 16px;
+      transition: background 0.15s;
+    }
+    .drain-item:hover { background: rgba(255,255,255,0.045); }
+    .drain-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+    .drain-left { display: flex; align-items: center; gap: 8px; }
+    .drain-icon { font-size: 15px; line-height: 1; }
+    .drain-name { font-size: 12.5px; font-weight: 500; }
+    .drain-right { text-align: right; }
+    .drain-amt { font-size: 14px; font-weight: 700; letter-spacing: -0.3px; font-variant-numeric: tabular-nums; }
+    .drain-pct { font-size: 10.5px; color: var(--text-sub); margin-top: 1px; }
+    .drain-track { height: 2.5px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
+    .drain-fill { height: 100%; border-radius: 2px; width: 0%; transition: width 0.9s cubic-bezier(0.34,1.1,0.64,1) 0.25s; }
+    .drain-spk { opacity: 0.65; line-height: 0; }
+
+    /* ── Transactions ── */
+    .tx-card {
+      background: var(--bg-card);
+      border-radius: var(--r); padding: 28px 32px;
+      box-shadow: var(--card-shadow); margin-bottom: 20px;
+    }
+    .tx-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .tx-see-all { font-size: 12px; font-weight: 500; color: var(--accent); text-decoration: none; }
+    .tx-see-all:hover { opacity: 0.75; }
+    .tx-list-inner { list-style: none; }
+    .tx-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 0; gap: 16px;
+    }
+    .tx-row + .tx-row { border-top: 1px solid rgba(255,255,255,0.04); }
+    .tx-left { display: flex; align-items: center; gap: 11px; overflow: hidden; min-width: 0; }
+    .tx-ico {
+      width: 34px; height: 34px; border-radius: 9px;
+      background: rgba(255,255,255,0.04);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
+    }
+    .tx-merchant { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tx-meta { font-size: 11px; color: var(--text-sub); margin-top: 1px; }
+    .tx-amt { font-size: 13.5px; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .tx-amt.neg { color: var(--rose); }
+    .tx-amt.pos { color: var(--mint); }
+    .tx-empty { text-align: center; padding: 28px; color: var(--text-sub); font-size: 13px; }
+
+    /* ── Link CTA ── */
+    .link-cta {
+      border-radius: calc(var(--r) + 1px);
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(59,130,246,0.25), rgba(16,217,160,0.12));
+    }
+    .link-cta-inner {
+      display: flex; align-items: center; gap: 16px;
+      background: var(--bg-card);
+      border-radius: var(--r);
+      padding: 18px 24px;
+    }
+    .link-cta-icon {
+      width: 38px; height: 38px; border-radius: 9px;
+      background: var(--accent-glow);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .link-cta-text { flex: 1; }
+    .link-cta-title { font-size: 13.5px; font-weight: 600; }
+    .link-cta-sub { font-size: 11.5px; color: var(--text-sub); margin-top: 2px; }
+    .btn-link-sm {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(59,130,246,0.1); color: var(--accent);
+      font-size: 12.5px; font-weight: 600; padding: 9px 18px;
+      border-radius: 8px; border: 1px solid rgba(59,130,246,0.2);
+      cursor: pointer; font-family: inherit; white-space: nowrap;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-link-sm:hover { background: rgba(59,130,246,0.18); border-color: rgba(59,130,246,0.35); }
+    .btn-link-sm:disabled { opacity: 0.5; cursor: not-allowed; }
 
     /* ── Toast ── */
-    .toast-container {
-      position: fixed; top: 24px; right: 24px;
-      z-index: 1000; display: flex; flex-direction: column; gap: 8px;
-    }
-    .toast {
-      padding: 14px 20px; border-radius: 10px;
-      font-size: 13px; font-weight: 500;
-      backdrop-filter: blur(12px);
-      animation: toastIn 0.35s ease both;
-      max-width: 360px;
-    }
-    .toast.error { background: rgba(255,85,85,0.15); border: 1px solid rgba(255,85,85,0.3); color: #FF5555; }
-    .toast.success { background: rgba(40,200,64,0.15); border: 1px solid rgba(40,200,64,0.3); color: #28C840; }
-    .toast.info { background: rgba(26,86,219,0.15); border: 1px solid rgba(26,86,219,0.3); color: var(--cyan); }
-    .toast.fade-out { animation: toastOut 0.3s ease both; }
-    @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
-    @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateX(40px); } }
+    .toast-container { position: fixed; top: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+    .toast { padding: 12px 18px; border-radius: 10px; font-size: 12.5px; font-weight: 500; backdrop-filter: blur(12px); max-width: 320px; animation: toastIn 0.3s ease both; }
+    .toast.fade-out { animation: toastOut 0.25s ease both; }
+    .toast.error   { background: rgba(244,63,94,0.12);  border: 1px solid rgba(244,63,94,0.22);  color: #FB7185; }
+    .toast.success { background: rgba(16,217,160,0.1);  border: 1px solid rgba(16,217,160,0.22); color: #10D9A0; }
+    .toast.info    { background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.22); color: #93C5FD; }
 
-    /* ── Mobile: bottom nav ── */
+    /* ── Spinner ── */
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.15); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; }
+
+    /* ── Animations ── */
+    .reveal { opacity: 0; transform: translateY(10px); }
+    .reveal.in { opacity: 1; transform: translateY(0); transition: opacity 0.5s ease, transform 0.5s ease; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(16px) scale(0.96); } to { opacity: 1; transform: none; } }
+    @keyframes toastOut { to { opacity: 0; transform: translateX(16px); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Mobile ── */
+    @media (max-width: 960px) {
+      .hero-section { grid-template-columns: 1fr; }
+      .donut-card { flex-direction: row; align-items: center; gap: 28px; padding: 24px; }
+      .donut-svg-wrap { width: 150px; height: 150px; flex-shrink: 0; margin-bottom: 0; }
+      .drain-grid { grid-template-columns: 1fr; }
+    }
     @media (max-width: 768px) {
       .sidebar {
-        top: auto; bottom: 0; left: 0; right: 0;
-        width: 100%; height: 64px;
-        flex-direction: row; align-items: center;
-        border-right: none; border-top: 1px solid var(--border);
+        top: auto; left: 0; right: 0; bottom: 0; height: 60px;
+        width: 100%; flex-direction: row; align-items: center;
+        box-shadow: 0 -1px 0 rgba(255,255,255,0.05);
         padding: 0 8px;
       }
       .sidebar-logo { display: none; }
-      .sidebar-nav {
-        flex-direction: row; gap: 0; padding: 0;
-        justify-content: space-around; width: 100%;
-      }
-      .nav-item {
-        flex-direction: column; gap: 4px;
-        padding: 8px 6px; border-radius: 8px;
-        font-size: 11px; align-items: center; justify-content: center;
-      }
-      .nav-item .nav-icon { font-size: 20px; }
-      .nav-item .nav-label { font-size: 10px; }
+      .sidebar-nav { flex-direction: row; gap: 0; padding: 0; justify-content: space-around; width: 100%; flex: 1; }
+      .nav-item { flex-direction: column; gap: 3px; padding: 8px 6px; font-size: 10px; align-items: center; border-radius: 8px; }
+      .nav-svg { width: 18px; height: 18px; }
       .sidebar-bottom { display: none; }
-      .content { margin-left: 0; padding: 24px 16px 88px; }
-      .grid { grid-template-columns: 1fr; }
-      .two-col { grid-template-columns: 1fr; }
-      .connect-banner { flex-direction: column; gap: 16px; text-align: center; }
+      .main { margin-left: 0; padding: 24px 20px 80px; }
+    }
+    @media (max-width: 560px) {
+      .drain-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <div class="toast-container" id="toast-container"></div>
 
-  <!-- Sidebar -->
   <aside class="sidebar">
     <a href="/dashboard.html" class="sidebar-logo">
       <div class="logo-icon">H</div>
@@ -302,109 +373,169 @@
     </a>
     <nav class="sidebar-nav">
       <a href="/dashboard.html" class="nav-item active">
-        <span class="nav-icon">&#127968;</span>
-        <span class="nav-label">Dashboard</span>
+        <svg class="nav-svg" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/>
+          <rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/>
+        </svg>
+        <span class="nav-label">Overview</span>
       </a>
       <a href="/transactions.html" class="nav-item">
-        <span class="nav-icon">&#128179;</span>
+        <svg class="nav-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 4.5h12M2 8h8M2 11.5h5"/><path d="M11 9.5l2.5 2-2.5 2"/>
+        </svg>
         <span class="nav-label">Transactions</span>
       </a>
       <a href="/savings.html" class="nav-item">
-        <span class="nav-icon">&#128274;</span>
+        <svg class="nav-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="5" width="12" height="9" rx="2"/><path d="M5 5V4a3 3 0 0 1 6 0v1"/>
+        </svg>
         <span class="nav-label">Savings</span>
       </a>
       <a href="/settings.html" class="nav-item">
-        <span class="nav-icon">&#9881;&#65039;</span>
+        <svg class="nav-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v1.3M8 13.2v1.3M1.5 8h1.3M13.2 8h1.3M3.4 3.4l.9.9M11.7 11.7l.9.9M3.4 12.6l.9-.9M11.7 4.3l.9-.9"/>
+        </svg>
         <span class="nav-label">Settings</span>
       </a>
     </nav>
     <div class="sidebar-bottom">
+      <div class="user-pill">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <div style="overflow:hidden">
+          <div class="user-name" id="user-name">—</div>
+          <div class="user-email" id="user-email"></div>
+        </div>
+      </div>
       <button class="nav-item logout" onclick="handleLogout()">
-        <span class="nav-icon">&#128682;</span>
-        <span class="nav-label">Log Out</span>
+        <svg class="nav-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3M10 11l3-3-3-3M13 8H6"/>
+        </svg>
+        <span class="nav-label">Sign out</span>
       </button>
     </div>
   </aside>
 
-  <!-- Main Content -->
-  <div class="content">
-    <h1 class="page-title">Dashboard</h1>
+  <main class="main" id="main">
 
-    <!-- Connect Bank Banner -->
-    <div class="connect-banner" id="connect-banner">
-      <div class="connect-banner-text">
-        <h3 id="connect-title">Connect your bank account</h3>
-        <p id="connect-desc">Link your bank to see balances, transactions, and spending insights.</p>
+    <!-- Loading -->
+    <div id="state-loading">
+      <div class="sk-line skeleton" style="height:28px;width:200px;margin-bottom:36px;"></div>
+      <div style="display:grid;grid-template-columns:300px 1fr;gap:20px;margin-bottom:20px;">
+        <div class="skeleton" style="height:300px;border-radius:16px;"></div>
+        <div class="skeleton" style="height:300px;border-radius:16px;"></div>
       </div>
-      <button class="btn-primary" id="connect-btn" onclick="connectBank()">Connect Bank</button>
+      <div class="skeleton" style="height:220px;border-radius:16px;margin-bottom:20px;"></div>
+      <div class="skeleton" style="height:280px;border-radius:16px;"></div>
     </div>
 
-    <!-- Summary Cards -->
-    <div class="grid">
-      <div class="card card-balance">
-        <div class="card-label">Total Balance</div>
-        <div id="total-balance"><div class="skeleton skeleton-value"></div></div>
-        <div id="accounts-count"><div class="skeleton skeleton-sub"></div></div>
-      </div>
-      <div class="card">
-        <div class="card-label">Monthly Spending</div>
-        <div id="monthly-spending"><div class="skeleton skeleton-value"></div></div>
-        <div class="card-sub">Last 30 days</div>
-      </div>
-      <div class="card">
-        <div class="card-label">Transactions</div>
-        <div id="tx-count"><div class="skeleton skeleton-value"></div></div>
-        <div class="card-sub">Last 30 days</div>
-      </div>
-    </div>
-
-    <!-- Transactions + Categories -->
-    <div class="two-col">
-      <div class="card">
-        <div class="card-title">
-          <span>Recent Transactions</span>
-          <span id="tx-showing" style="font-size:12px;color:var(--text-muted);font-weight:400;"></span>
+    <!-- Empty state -->
+    <div id="state-empty" class="hidden">
+      <div class="empty-hero">
+        <div class="empty-illo">
+          <svg width="210" height="170" viewBox="0 0 210 170" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="105" cy="84" r="76" fill="rgba(59,130,246,0.035)"/>
+            <circle cx="105" cy="84" r="56" stroke="rgba(59,130,246,0.13)" stroke-width="15" stroke-dasharray="4.8 4.8"/>
+            <circle cx="105" cy="84" r="41" stroke="rgba(255,255,255,0.035)" stroke-width="1"/>
+            <rect x="56" y="142" width="10" height="12" rx="5" fill="rgba(59,130,246,0.1)"/>
+            <rect x="72" y="134" width="10" height="20" rx="5" fill="rgba(59,130,246,0.16)"/>
+            <rect x="88" y="126" width="10" height="28" rx="5" fill="rgba(59,130,246,0.22)"/>
+            <rect x="104" y="131" width="10" height="23" rx="5" fill="rgba(16,217,160,0.16)"/>
+            <rect x="120" y="137" width="10" height="17" rx="5" fill="rgba(16,217,160,0.1)"/>
+            <circle cx="52" cy="48" r="3" fill="rgba(59,130,246,0.28)"/>
+            <circle cx="162" cy="34" r="2" fill="rgba(16,217,160,0.28)"/>
+            <circle cx="168" cy="62" r="4" fill="rgba(139,92,246,0.18)"/>
+            <circle cx="42" cy="104" r="2.5" fill="rgba(251,146,60,0.18)"/>
+            <rect x="87" y="77" width="36" height="5" rx="2.5" fill="rgba(255,255,255,0.07)"/>
+            <rect x="93" y="88" width="24" height="4" rx="2" fill="rgba(255,255,255,0.045)"/>
+          </svg>
         </div>
-        <div id="tx-list">
-          <div class="skeleton skeleton-tx"></div>
-          <div class="skeleton skeleton-tx"></div>
-          <div class="skeleton skeleton-tx"></div>
-          <div class="skeleton skeleton-tx"></div>
-          <div class="skeleton skeleton-tx"></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">Spending by Category</div>
-        <div id="cat-chart">
-          <div class="skeleton skeleton-tx"></div>
-          <div class="skeleton skeleton-tx"></div>
-          <div class="skeleton skeleton-tx"></div>
-        </div>
+        <h2>Your financial picture,<br>waiting to be drawn.</h2>
+        <p>Connect your bank account to see balances, spending patterns, and insights — all in one clean view.</p>
+        <button class="btn-connect-hero" id="empty-connect-btn" onclick="connectBank('empty')">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          Connect Bank Account
+        </button>
+        <p class="empty-trust">256-bit encryption · Read-only access · Powered by Plaid</p>
       </div>
     </div>
 
-    <!-- Savings Lockbox -->
-    <div class="lockbox-section">
-      <div class="lockbox-card">
-        <div class="lockbox-header">
-          <div class="card-title" style="margin-bottom:0;">Savings Lockbox</div>
-          <button class="btn-outline btn-sm" onclick="editGoal()">Edit Goal</button>
+    <!-- Data view -->
+    <div id="state-data" class="hidden">
+
+      <div class="page-header reveal">
+        <div class="greeting" id="greeting">Overview</div>
+        <div class="greeting-sub" id="greeting-sub"></div>
+      </div>
+
+      <div class="hero-section">
+        <div class="donut-card reveal">
+          <div class="donut-svg-wrap" id="donut-svg-wrap">
+            <div class="donut-center" id="donut-default">
+              <div class="donut-center-label">Total</div>
+              <div class="donut-center-value" id="donut-total">—</div>
+            </div>
+            <div class="donut-hover" id="donut-hover">
+              <div class="hov-name" id="hov-name"></div>
+              <div class="hov-val" id="hov-val"></div>
+              <div class="hov-pct" id="hov-pct"></div>
+            </div>
+          </div>
+          <div class="donut-legend" id="donut-legend"></div>
         </div>
-        <div class="lockbox-amounts">
-          <span class="lockbox-current" id="lockbox-current">$0.00</span>
-          <span class="lockbox-goal" id="lockbox-goal">of $5,000.00 goal</span>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill" id="lockbox-progress" style="width: 0%"></div>
-        </div>
-        <div class="progress-label" id="lockbox-percent">0% reached</div>
-        <div class="lockbox-actions">
-          <input type="number" class="lockbox-input" id="lockbox-amount" placeholder="Amount to save" min="0" step="0.01" />
-          <button class="btn-primary btn-sm" onclick="addToLockbox()">Add Savings</button>
+
+        <div class="accounts-card reveal">
+          <div class="accounts-card-header">
+            <div class="eyebrow">Your accounts</div>
+            <div class="section-title">Asset breakdown</div>
+          </div>
+          <div id="accounts-list"></div>
+          <div class="acct-total">
+            <span class="acct-total-label">Total balance</span>
+            <span class="acct-total-val" id="acct-total-val">—</span>
+          </div>
         </div>
       </div>
+
+      <div class="drain-card reveal" id="drain-card">
+        <div class="drain-header">
+          <div>
+            <div class="eyebrow">Last 30 days</div>
+            <div class="section-title">Where it goes</div>
+          </div>
+          <div>
+            <div class="drain-total-label">Total spent</div>
+            <div class="drain-total-val" id="drain-total">—</div>
+          </div>
+        </div>
+        <div class="drain-grid" id="drain-grid"></div>
+      </div>
+
+      <div class="tx-card reveal">
+        <div class="tx-card-header">
+          <div>
+            <div class="eyebrow">Latest</div>
+            <div class="section-title">Recent activity</div>
+          </div>
+          <a href="/transactions.html" class="tx-see-all">See all →</a>
+        </div>
+        <div id="tx-list"></div>
+      </div>
+
+      <div class="link-cta reveal" id="link-cta">
+        <div class="link-cta-inner">
+          <div class="link-cta-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="#3B82F6" stroke-width="2.2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="link-cta-text">
+            <div class="link-cta-title">Add another account</div>
+            <div class="link-cta-sub">Connect more banks for a complete financial picture</div>
+          </div>
+          <button class="btn-link-sm" id="link-cta-btn" onclick="connectBank('cta')">Link Account</button>
+        </div>
+      </div>
+
     </div>
-  </div>
+  </main>
 
   <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -413,7 +544,7 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzbWlndWhuZGdqbXlnYnhoYWdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MDY2NTYsImV4cCI6MjA5MDM4MjY1Nn0.xhPxYmIxBdJu856e63WQna_fQTC1FRqILZcuctemIpo';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    (async function() {
+    (async function () {
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) { window.location.href = '/login.html'; return; }
       document.body.classList.add('loaded');
