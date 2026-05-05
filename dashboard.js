@@ -1,14 +1,14 @@
 // ── Palette ──
-const SEG_COLORS = ['#3B82F6', '#10D9A0', '#8B5CF6', '#FB923C', '#F43F5E', '#FBBF24'];
+const SEG_COLORS = ['#5B6EF5', '#06D6A0', '#A78BFA', '#FB923C', '#FF4757', '#FBBF24', '#38BDF8'];
 
 const CAT_CFG = {
-  'Food and Drink':  { label: 'Food & Dining',  icon: '🍽', color: '#FB923C' },
-  'Travel':          { label: 'Transport',       icon: '🚊', color: '#3B82F6' },
-  'Shops':           { label: 'Shopping',        icon: '🛍', color: '#8B5CF6' },
-  'Recreation':      { label: 'Entertainment',   icon: '🎮', color: '#10D9A0' },
-  'Service':         { label: 'Subscriptions',   icon: '📱', color: '#F43F5E' },
-  'Healthcare':      { label: 'Health',          icon: '💊', color: '#EC4899' },
-  'Payment':         { label: 'Payments',        icon: '💳', color: '#FBBF24' },
+  'Food and Drink':  { label: 'Food & Dining',   icon: '🍽', color: '#FB923C' },
+  'Travel':          { label: 'Transport',        icon: '🚊', color: '#5B6EF5' },
+  'Shops':           { label: 'Shopping',         icon: '🛍', color: '#A78BFA' },
+  'Recreation':      { label: 'Entertainment',    icon: '🎮', color: '#06D6A0' },
+  'Service':         { label: 'Subscriptions',    icon: '📱', color: '#FF4757' },
+  'Healthcare':      { label: 'Health',           icon: '💊', color: '#EC4899' },
+  'Payment':         { label: 'Payments',         icon: '💳', color: '#FBBF24' },
 };
 
 function catCfg(key) {
@@ -67,31 +67,27 @@ function countUp(el, target, duration, formatter) {
   })(start);
 }
 
-function countUpCurrency(el, target, duration = 1300) {
+function countUpCurrency(el, target, duration = 1200) {
   countUp(el, target, duration, n => fmt(n));
 }
 
 // ── Sparkline ──
 let _spkId = 0;
 function sparkline(values, color, w = 60, h = 22) {
-  const nonZero = values.some(v => v > 0);
-  if (values.length < 2 || !nonZero) return `<svg width="${w}" height="${h}"></svg>`;
+  if (values.length < 2 || !values.some(v => v > 0)) return `<svg width="${w}" height="${h}"></svg>`;
   const id = 'sg' + (_spkId++);
-  const max = Math.max(...values);
-  const min = Math.min(...values, 0);
-  const range = max - min || 1;
+  const max = Math.max(...values), min = Math.min(...values, 0), range = max - min || 1;
   const pts = values.map((v, i) => {
     const x = ((i / (values.length - 1)) * (w - 4) + 2).toFixed(1);
     const y = (h - 4 - ((v - min) / range) * (h - 8)).toFixed(1);
     return `${x},${y}`;
   }).join(' ');
-  const area = `2,${h} ${pts} ${w - 2},${h}`;
   return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none">
     <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="${color}" stop-opacity="0.35"/>
+      <stop offset="0%" stop-color="${color}" stop-opacity="0.3"/>
       <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
     </linearGradient></defs>
-    <polygon points="${area}" fill="url(#${id})"/>
+    <polygon points="2,${h} ${pts} ${w - 2},${h}" fill="url(#${id})"/>
     <polyline points="${pts}" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>`;
 }
@@ -110,36 +106,67 @@ function weeklyBuckets(transactions, catKey, n = 4) {
   return buckets;
 }
 
-// ── State switcher ──
+// ── State switcher (fixed: uses classList, not .hidden property) ──
 function setState(s) {
-  document.getElementById('state-loading').hidden = s !== 'loading';
-  document.getElementById('state-empty').hidden   = s !== 'empty';
-  document.getElementById('state-data').hidden    = s !== 'data';
+  ['loading', 'empty', 'data'].forEach(name => {
+    const el = document.getElementById('state-' + name);
+    if (name === s) {
+      el.classList.remove('hidden');
+    } else {
+      el.classList.add('hidden');
+    }
+  });
 }
 
 // ── Entry animation ──
 function animateReveal() {
   document.querySelectorAll('#state-data .reveal').forEach((el, i) => {
-    setTimeout(() => el.classList.add('in'), i * 90);
+    setTimeout(() => el.classList.add('in'), i * 80);
   });
 }
 
-// ── Donut chart ──
-function buildSegments(accounts) {
-  const map = {};
-  accounts.forEach(acc => {
-    const key = acc.institution_name || 'Unknown';
-    map[key] = (map[key] || 0) + (acc.balances?.current || 0);
-  });
-  return Object.entries(map)
-    .sort((a, b) => b[1] - a[1])
-    .map(([name, amount], i) => ({ name, amount, color: SEG_COLORS[i % SEG_COLORS.length] }));
+// ── Stats bar ──
+function renderStats(transactions) {
+  const spent  = transactions.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0);
+  const income = transactions.filter(t => t.amount < 0).reduce((s, t) => s + Math.abs(t.amount), 0);
+
+  countUpCurrency(document.getElementById('stat-total'),  State.totalBalance, 1300);
+  countUpCurrency(document.getElementById('stat-spent'),  spent, 1000);
+  countUpCurrency(document.getElementById('stat-income'), income, 1000);
 }
 
-function renderDonut(segments, total) {
-  const wrap = document.getElementById('donut-svg-wrap');
-  const legend = document.getElementById('donut-legend');
-  const R = 80, CX = 100, CY = 100, C = 2 * Math.PI * R, GAP = 1.8;
+// ── Pie chart (spending by category) ──
+function buildSpendingSegments(transactions) {
+  const catMap = {};
+  transactions.filter(t => t.amount > 0).forEach(tx => {
+    const key = tx.category?.[0] || 'Other';
+    if (key === 'Transfer') return;
+    catMap[key] = (catMap[key] || 0) + tx.amount;
+  });
+  const entries = Object.entries(catMap).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const total = entries.reduce((s, [, v]) => s + v, 0);
+  return { segments: entries.map(([key, amount], i) => ({
+    name: catCfg(key).label,
+    amount,
+    color: catCfg(key).color || SEG_COLORS[i % SEG_COLORS.length],
+  })), total };
+}
+
+function renderPieChart(transactions) {
+  const wrap   = document.getElementById('pie-wrap');
+  const legend = document.getElementById('pie-legend');
+  const totalEl = document.getElementById('pie-total');
+
+  const { segments, total } = buildSpendingSegments(transactions);
+
+  if (!segments.length || total === 0) {
+    wrap.querySelector('#pie-default .pie-center-label').textContent = 'No Data';
+    totalEl.textContent = '—';
+    legend.innerHTML = '<div style="font-size:12px;color:var(--text-dim);text-align:center;width:100%;padding:8px 0">No spending data yet</div>';
+    return;
+  }
+
+  const R = 75, CX = 95, CY = 95, C = 2 * Math.PI * R, GAP = 1.6;
 
   let offsetFrac = 0.25;
   const circles = segments.map((seg, i) => {
@@ -147,9 +174,9 @@ function renderDonut(segments, total) {
     const dashLen = Math.max(frac * C - GAP, 0);
     const offset = offsetFrac * C;
     offsetFrac += frac;
-    return `<circle class="dseg"
+    return `<circle class="pseg"
       cx="${CX}" cy="${CY}" r="${R}"
-      fill="none" stroke="${seg.color}" stroke-width="13"
+      fill="none" stroke="${seg.color}" stroke-width="22"
       stroke-linecap="butt"
       stroke-dasharray="0 ${C}"
       stroke-dashoffset="${offset}"
@@ -157,50 +184,53 @@ function renderDonut(segments, total) {
       data-name="${esc(seg.name)}" data-amount="${seg.amount}"
       data-pct="${(frac * 100).toFixed(1)}"
       style="pointer-events:stroke;cursor:pointer;
-             transition:stroke-dasharray 0.9s cubic-bezier(0.34,1.1,0.64,1) ${i * 0.07}s, opacity 0.18s"/>`;
+             transition:stroke-dasharray 0.85s cubic-bezier(0.34,1.1,0.64,1) ${i * 0.06}s, opacity 0.18s"/>`;
   });
 
   wrap.insertAdjacentHTML('afterbegin',
-    `<svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;overflow:visible;display:block">
-      <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="13"/>
+    `<svg viewBox="0 0 190 190" fill="none" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible">
+      <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="22"/>
       ${circles.join('')}
     </svg>`
   );
 
-  // Animate in (double-rAF to ensure paint)
+  // Animate (double rAF to ensure initial paint)
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    wrap.querySelectorAll('.dseg').forEach(seg => {
+    wrap.querySelectorAll('.pseg').forEach(seg => {
       const t = parseFloat(seg.dataset.target), c = parseFloat(seg.dataset.c);
       seg.style.strokeDasharray = `${t} ${c - t}`;
     });
   }));
 
+  countUpCurrency(totalEl, total, 1200);
+
   // Legend
-  legend.innerHTML = segments.map(s =>
-    `<div class="legend-item">
-       <div class="legend-dot" style="background:${s.color}"></div>
-       <span>${esc(s.name)}</span>
-     </div>`
-  ).join('');
+  legend.innerHTML = segments.map(s => {
+    const pct = ((s.amount / total) * 100).toFixed(1);
+    return `<div class="leg-row">
+      <div class="leg-left">
+        <div class="leg-dot" style="background:${s.color}"></div>
+        <span class="leg-name">${esc(s.name)}</span>
+      </div>
+      <span class="leg-pct">${pct}%</span>
+    </div>`;
+  }).join('');
 
-  // Hover interaction
-  const hoverEl  = document.getElementById('donut-hover');
-  const defaultEl = document.getElementById('donut-default');
-  const totalEl  = document.getElementById('donut-total');
+  // Hover
+  const hoverEl   = document.getElementById('pie-hover');
+  const defaultEl = document.getElementById('pie-default');
 
-  countUpCurrency(totalEl, total, 1400);
-
-  wrap.querySelectorAll('.dseg').forEach(seg => {
+  wrap.querySelectorAll('.pseg').forEach(seg => {
     seg.addEventListener('mouseenter', () => {
-      wrap.querySelectorAll('.dseg').forEach(s => { s.style.opacity = s === seg ? '1' : '0.2'; });
-      document.getElementById('hov-name').textContent = seg.dataset.name;
-      document.getElementById('hov-val').textContent  = fmt(parseFloat(seg.dataset.amount));
-      document.getElementById('hov-pct').textContent  = seg.dataset.pct + '%';
+      wrap.querySelectorAll('.pseg').forEach(s => { s.style.opacity = s === seg ? '1' : '0.2'; });
+      document.getElementById('phov-name').textContent = seg.dataset.name;
+      document.getElementById('phov-val').textContent  = fmt(parseFloat(seg.dataset.amount));
+      document.getElementById('phov-pct').textContent  = seg.dataset.pct + '%';
       hoverEl.classList.add('vis');
       defaultEl.style.opacity = '0';
     });
     seg.addEventListener('mouseleave', () => {
-      wrap.querySelectorAll('.dseg').forEach(s => { s.style.opacity = '1'; });
+      wrap.querySelectorAll('.pseg').forEach(s => { s.style.opacity = '1'; });
       hoverEl.classList.remove('vis');
       defaultEl.style.opacity = '1';
     });
@@ -208,11 +238,10 @@ function renderDonut(segments, total) {
 }
 
 // ── Accounts list ──
-function renderAccounts(accounts, segments) {
-  const list = document.getElementById('accounts-list');
+function renderAccounts(accounts) {
+  const list    = document.getElementById('accounts-list');
   const totalEl = document.getElementById('acct-total-val');
 
-  // Group by institution
   const byBank = {};
   accounts.forEach(acc => {
     const key = acc.institution_name || 'Unknown';
@@ -220,13 +249,15 @@ function renderAccounts(accounts, segments) {
     byBank[key].push(acc);
   });
 
+  const bankIcons = ['🏦', '🏛', '💰', '🏧', '💵'];
+
   list.innerHTML = Object.entries(byBank).map(([bank, accs], i) => {
-    const bal = accs.reduce((s, a) => s + (a.balances?.current || 0), 0);
+    const bal   = accs.reduce((s, a) => s + (a.balances?.current || 0), 0);
     const color = SEG_COLORS[i % SEG_COLORS.length];
     const types = [...new Set(accs.map(a => a.subtype || a.type || 'account'))].join(', ');
     return `<div class="acct-row">
       <div class="acct-left">
-        <div class="acct-dot" style="background:${color}"></div>
+        <div class="acct-icon" style="background:${color}20">${bankIcons[i % bankIcons.length]}</div>
         <div>
           <div class="acct-name">${esc(bank)}</div>
           <div class="acct-type">${esc(types)}</div>
@@ -239,11 +270,11 @@ function renderAccounts(accounts, segments) {
   countUpCurrency(totalEl, State.totalBalance, 1400);
 }
 
-// ── Drain section ──
+// ── Spending breakdown ──
 function renderDrain(transactions) {
-  const grid = document.getElementById('drain-grid');
+  const grid    = document.getElementById('drain-grid');
   const totalEl = document.getElementById('drain-total');
-  const card = document.getElementById('drain-card');
+  const card    = document.getElementById('drain-card');
 
   const spending = transactions.filter(t => t.amount > 0);
   if (!spending.length) { card.classList.add('hidden'); return; }
@@ -255,17 +286,17 @@ function renderDrain(transactions) {
     catMap[key] = (catMap[key] || 0) + tx.amount;
   });
 
-  const sorted = Object.entries(catMap).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const sorted     = Object.entries(catMap).sort((a, b) => b[1] - a[1]).slice(0, 6);
   const totalSpent = sorted.reduce((s, [, v]) => s + v, 0);
-  const maxAmt = sorted[0]?.[1] || 1;
+  const maxAmt     = sorted[0]?.[1] || 1;
 
   countUpCurrency(totalEl, totalSpent, 1100);
 
   grid.innerHTML = sorted.map(([catKey, amount]) => {
-    const cfg = catCfg(catKey);
-    const pct = ((amount / totalSpent) * 100).toFixed(1);
+    const cfg    = catCfg(catKey);
+    const pct    = ((amount / totalSpent) * 100).toFixed(1);
     const barPct = ((amount / maxAmt) * 100).toFixed(1);
-    const spk = sparkline(weeklyBuckets(transactions, catKey), cfg.color, 60, 22);
+    const spk    = sparkline(weeklyBuckets(transactions, catKey), cfg.color, 60, 22);
     return `<div class="drain-item">
       <div class="drain-top">
         <div class="drain-left">
@@ -284,7 +315,6 @@ function renderDrain(transactions) {
     </div>`;
   }).join('');
 
-  // Trigger bar animations after paint
   setTimeout(() => {
     grid.querySelectorAll('.drain-fill').forEach(b => { b.style.width = b.dataset.target + '%'; });
   }, 200);
@@ -293,7 +323,7 @@ function renderDrain(transactions) {
 // ── Transactions ──
 function renderTransactions(transactions) {
   const container = document.getElementById('tx-list');
-  const recent = transactions.slice(0, 8);
+  const recent    = transactions.slice(0, 8);
 
   if (!recent.length) {
     container.innerHTML = '<div class="tx-empty">No transactions yet</div>';
@@ -301,10 +331,10 @@ function renderTransactions(transactions) {
   }
 
   container.innerHTML = `<ul class="tx-list-inner">${recent.map(tx => {
-    const isNeg = tx.amount > 0;
+    const isDebit  = tx.amount > 0;
     const merchant = tx.merchant_name || tx.name || 'Unknown';
-    const key = tx.category?.[0] || 'Other';
-    const icon = catCfg(key).icon;
+    const key      = tx.category?.[0] || 'Other';
+    const icon     = catCfg(key).icon;
     return `<li class="tx-row">
       <div class="tx-left">
         <div class="tx-ico">${icon}</div>
@@ -313,7 +343,7 @@ function renderTransactions(transactions) {
           <div class="tx-meta">${fmtDate(tx.date)}${tx.institution_name ? ' · ' + esc(tx.institution_name) : ''}</div>
         </div>
       </div>
-      <div class="tx-amt ${isNeg ? 'neg' : 'pos'}">${isNeg ? '−' : '+'}${fmt(Math.abs(tx.amount))}</div>
+      <div class="tx-amt ${isDebit ? 'neg' : 'pos'}">${isDebit ? '−' : '+'}${fmt(Math.abs(tx.amount))}</div>
     </li>`;
   }).join('')}</ul>`;
 }
@@ -353,7 +383,7 @@ function resetBtn(btn, source) {
   if (!btn) return;
   btn.disabled = false;
   if (source === 'empty') {
-    btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg> Connect Bank Account`;
+    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg> Connect Bank Account`;
   } else {
     btn.textContent = 'Link Account';
   }
@@ -363,7 +393,10 @@ function resetBtn(btn, source) {
 async function loadDashboardData() {
   setState('loading');
   try {
-    const [balRes, txRes] = await Promise.all([authFetch('/api/balances'), authFetch('/api/transactions')]);
+    const [balRes, txRes] = await Promise.all([
+      authFetch('/api/balances'),
+      authFetch('/api/transactions'),
+    ]);
     const balData = await balRes.json();
     const txData  = await txRes.json();
 
@@ -375,13 +408,13 @@ async function loadDashboardData() {
 
     setState('data');
 
-    const segments = buildSegments(State.accounts);
-    renderDonut(segments, State.totalBalance);
-    renderAccounts(State.accounts, segments);
+    renderStats(State.transactions);
+    renderPieChart(State.transactions);
+    renderAccounts(State.accounts);
     renderDrain(State.transactions);
     renderTransactions(State.transactions);
 
-    setTimeout(animateReveal, 60);
+    setTimeout(animateReveal, 50);
   } catch {
     showToast('Failed to load dashboard.', 'error');
     setState('empty');
@@ -411,16 +444,16 @@ async function initUser() {
   if (!session) return;
   State.user = session.user;
 
-  const email = session.user.email || '';
-  const name  = session.user.user_metadata?.full_name || email.split('@')[0] || 'there';
+  const email    = session.user.email || '';
+  const name     = session.user.user_metadata?.full_name || email.split('@')[0] || 'there';
   const initials = name.replace(/[^a-zA-Z\s]/g, '').trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?';
 
   document.getElementById('user-avatar').textContent = initials;
   document.getElementById('user-name').textContent   = name;
   document.getElementById('user-email').textContent  = email;
 
-  const h = new Date().getHours();
-  const greet = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  const h         = new Date().getHours();
+  const greet     = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
   const firstName = name.split(' ')[0];
   document.getElementById('greeting').textContent     = `${greet}, ${firstName}.`;
   document.getElementById('greeting-sub').textContent = new Date().toLocaleDateString('en-US', {

@@ -6,25 +6,25 @@
   <title>Dashboard — Holdwise</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg: #08090E;
-      --bg-card: #0D1117;
-      --bg-sidebar: #09111F;
-      --text: #F1F5F9;
-      --text-sub: rgba(241,245,249,0.45);
-      --text-dim: rgba(241,245,249,0.22);
-      --accent: #3B82F6;
-      --accent-glow: rgba(59,130,246,0.14);
-      --mint: #10D9A0;
-      --rose: #F43F5E;
-      --sidebar-w: 232px;
+      --bg: #07080F;
+      --bg-card: #0E1018;
+      --bg-sidebar: #0A0B14;
+      --border: rgba(255,255,255,0.07);
+      --text: #FFFFFF;
+      --text-sub: rgba(255,255,255,0.48);
+      --text-dim: rgba(255,255,255,0.22);
+      --accent: #5B6EF5;
+      --accent-glow: rgba(91,110,245,0.15);
+      --green: #06D6A0;
+      --red: #FF4757;
+      --sidebar-w: 220px;
       --r: 16px;
       --r-sm: 10px;
-      --card-shadow: 0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
     }
 
     body {
@@ -34,10 +34,12 @@
       -webkit-font-smoothing: antialiased;
       min-height: 100vh;
       opacity: 0;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.35s ease;
     }
     body.loaded { opacity: 1; }
-    body.fade-out { opacity: 0; transition: opacity 0.25s ease; }
+    body.fade-out { opacity: 0; transition: opacity 0.2s ease; }
+
+    .hidden { display: none !important; }
 
     /* ── Sidebar ── */
     .sidebar {
@@ -46,22 +48,21 @@
       background: var(--bg-sidebar);
       display: flex; flex-direction: column;
       z-index: 100;
-      box-shadow: 1px 0 0 rgba(255,255,255,0.04);
+      border-right: 1px solid var(--border);
     }
     .sidebar-logo {
       display: flex; align-items: center; gap: 10px;
-      padding: 28px 20px 32px;
+      padding: 26px 18px 28px;
       text-decoration: none;
     }
     .logo-icon {
-      width: 32px; height: 32px;
-      background: linear-gradient(135deg, var(--accent), #1D4ED8);
+      width: 30px; height: 30px;
+      background: var(--accent);
       border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 800; color: #fff;
-      flex-shrink: 0;
+      font-size: 13px; font-weight: 800; color: #fff; flex-shrink: 0;
     }
-    .logo-text { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+    .logo-text { font-size: 14.5px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
 
     .sidebar-nav { flex: 1; padding: 0 10px; display: flex; flex-direction: column; gap: 2px; }
     .nav-item {
@@ -74,15 +75,11 @@
       transition: color 0.15s, background 0.15s;
     }
     .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.04); }
-    .nav-item.active { color: var(--text); background: rgba(59,130,246,0.1); }
+    .nav-item.active { color: var(--text); background: rgba(91,110,245,0.12); }
     .nav-item.active .nav-svg { color: var(--accent); }
     .nav-svg { width: 16px; height: 16px; flex-shrink: 0; color: inherit; }
-    .nav-label { white-space: nowrap; }
 
-    .sidebar-bottom {
-      padding: 12px 10px 24px;
-      border-top: 1px solid rgba(255,255,255,0.04);
-    }
+    .sidebar-bottom { padding: 12px 10px 22px; border-top: 1px solid var(--border); }
     .user-pill {
       display: flex; align-items: center; gap: 10px;
       padding: 10px 12px; border-radius: var(--r-sm);
@@ -90,275 +87,282 @@
     }
     .user-avatar {
       width: 28px; height: 28px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--mint));
+      background: linear-gradient(135deg, var(--accent), var(--green));
       display: flex; align-items: center; justify-content: center;
       font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0;
     }
     .user-name { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .user-email { font-size: 11px; color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .nav-item.logout { color: rgba(244,63,94,0.65); }
-    .nav-item.logout:hover { color: var(--rose); background: rgba(244,63,94,0.07); }
+    .nav-item.logout { color: rgba(255,71,87,0.65); }
+    .nav-item.logout:hover { color: var(--red); background: rgba(255,71,87,0.07); }
 
     /* ── Main ── */
-    .main {
-      margin-left: var(--sidebar-w);
-      padding: 44px 52px 72px;
-      min-height: 100vh;
-    }
+    .main { margin-left: var(--sidebar-w); padding: 40px 48px 72px; min-height: 100vh; }
 
     /* ── Skeleton ── */
     .skeleton {
-      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.055) 50%, rgba(255,255,255,0.03) 75%);
       background-size: 200% 100%;
       animation: shimmer 1.8s ease infinite;
+      border-radius: var(--r);
     }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-    .sk-line { border-radius: 6px; }
-
-    .hidden { display: none !important; }
 
     /* ── Empty State ── */
-    .empty-hero {
+    .empty-wrap {
       display: flex; flex-direction: column; align-items: center;
-      justify-content: center; min-height: 72vh;
-      text-align: center; padding: 40px 20px;
-      animation: fadeUp 0.6s ease both;
+      justify-content: center; min-height: 74vh; text-align: center;
+      animation: fadeUp 0.55s ease both;
     }
-    .empty-illo { margin-bottom: 44px; }
-    .empty-hero h2 {
-      font-size: 28px; font-weight: 700; letter-spacing: -0.6px;
-      line-height: 1.3; margin-bottom: 14px;
+    .empty-illo { margin-bottom: 40px; }
+    .empty-wrap h2 {
+      font-size: 26px; font-weight: 700; letter-spacing: -0.5px;
+      line-height: 1.3; margin-bottom: 12px;
     }
-    .empty-hero p {
-      font-size: 15px; color: var(--text-sub);
-      max-width: 400px; line-height: 1.65; margin-bottom: 36px;
+    .empty-wrap p {
+      font-size: 14.5px; color: var(--text-sub);
+      max-width: 380px; line-height: 1.65; margin-bottom: 32px;
     }
-    .btn-connect-hero {
-      display: inline-flex; align-items: center; gap: 10px;
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 9px;
       background: var(--accent); color: #fff;
-      font-size: 14.5px; font-weight: 600; padding: 14px 28px;
+      font-size: 14px; font-weight: 600; padding: 13px 26px;
       border-radius: 12px; border: none; cursor: pointer;
       font-family: inherit; letter-spacing: -0.1px;
       transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
-      box-shadow: 0 8px 28px rgba(59,130,246,0.28);
+      box-shadow: 0 8px 24px rgba(91,110,245,0.3);
     }
-    .btn-connect-hero:hover { opacity: 0.92; transform: translateY(-2px); box-shadow: 0 12px 36px rgba(59,130,246,0.38); }
-    .btn-connect-hero:active { transform: none; }
-    .btn-connect-hero:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .empty-trust { margin-top: 18px; font-size: 11px; color: var(--text-dim); letter-spacing: 0.03em; }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-primary:active { transform: none; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .empty-trust { margin-top: 16px; font-size: 11px; color: var(--text-dim); letter-spacing: 0.03em; }
 
     /* ── Page header ── */
-    .page-header { margin-bottom: 36px; }
-    .greeting { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.2; }
-    .greeting-sub { font-size: 13px; color: var(--text-sub); margin-top: 5px; }
+    .page-header { margin-bottom: 28px; }
+    .greeting { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+    .greeting-sub { font-size: 13px; color: var(--text-sub); margin-top: 4px; }
 
-    /* ── Eyebrow / section labels ── */
-    .eyebrow {
-      font-size: 10px; font-weight: 600; color: var(--text-dim);
-      text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 3px;
-    }
-    .section-title { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; }
-
-    /* ── Hero layout ── */
-    .hero-section {
-      display: grid; grid-template-columns: 300px 1fr;
-      gap: 20px; align-items: start; margin-bottom: 20px;
-    }
-
-    /* ── Donut card ── */
-    .donut-card {
+    /* ── Stats bar ── */
+    .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+    .stat-card {
       background: var(--bg-card);
-      border-radius: var(--r); padding: 32px 28px;
-      box-shadow: var(--card-shadow);
+      border: 1px solid var(--border);
+      border-radius: var(--r); padding: 20px 22px;
+    }
+    .stat-label { font-size: 11px; font-weight: 500; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+    .stat-value { font-size: 24px; font-weight: 700; letter-spacing: -0.8px; font-variant-numeric: tabular-nums; }
+    .stat-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 600; margin-top: 6px; padding: 3px 8px;
+      border-radius: 20px;
+    }
+    .stat-badge.up { background: rgba(6,214,160,0.12); color: var(--green); }
+    .stat-badge.down { background: rgba(255,71,87,0.1); color: var(--red); }
+
+    /* ── Hero grid ── */
+    .hero-grid { display: grid; grid-template-columns: 310px 1fr; gap: 16px; margin-bottom: 16px; }
+
+    /* ── Pie chart card ── */
+    .chart-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 28px 24px;
       display: flex; flex-direction: column; align-items: center;
     }
-    .donut-svg-wrap {
-      position: relative; width: 200px; height: 200px; margin-bottom: 20px;
+    .card-title-row { width: 100%; margin-bottom: 4px; }
+    .card-eyebrow { font-size: 10px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; }
+    .card-title { font-size: 14px; font-weight: 600; margin-top: 2px; }
+
+    .pie-wrap {
+      position: relative; width: 190px; height: 190px;
+      margin: 20px auto 20px;
     }
-    .donut-svg-wrap svg { width: 100%; height: 100%; overflow: visible; display: block; }
-    .donut-center {
+    .pie-wrap svg { width: 100%; height: 100%; display: block; overflow: visible; }
+    .pie-center {
       position: absolute; inset: 0;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       pointer-events: none; transition: opacity 0.15s;
     }
-    .donut-center-label { font-size: 9.5px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; }
-    .donut-center-value { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; margin-top: 3px; font-variant-numeric: tabular-nums; }
-    .donut-hover {
+    .pie-center-label { font-size: 9px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; }
+    .pie-center-value { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; margin-top: 2px; font-variant-numeric: tabular-nums; }
+    .pie-hover {
       position: absolute; inset: 0;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       pointer-events: none; opacity: 0; transition: opacity 0.15s;
     }
-    .donut-hover.vis { opacity: 1; }
-    .hov-name { font-size: 11px; color: var(--text-sub); }
-    .hov-val { font-size: 18px; font-weight: 700; letter-spacing: -0.4px; margin-top: 2px; }
-    .hov-pct { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
-    .donut-legend { display: flex; flex-wrap: wrap; gap: 8px 14px; justify-content: center; }
-    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--text-sub); }
-    .legend-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .pie-hover.vis { opacity: 1; }
+    .phov-name { font-size: 10.5px; color: var(--text-sub); }
+    .phov-val { font-size: 17px; font-weight: 700; letter-spacing: -0.4px; margin-top: 2px; }
+    .phov-pct { font-size: 10.5px; color: var(--text-sub); margin-top: 2px; }
+
+    .pie-legend { width: 100%; display: flex; flex-direction: column; gap: 7px; }
+    .leg-row {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 12px;
+    }
+    .leg-left { display: flex; align-items: center; gap: 8px; }
+    .leg-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .leg-name { color: var(--text-sub); }
+    .leg-pct { font-size: 11px; color: var(--text-dim); }
 
     /* ── Accounts card ── */
     .accounts-card {
-      background: var(--bg-card);
-      border-radius: var(--r); padding: 28px 32px;
-      box-shadow: var(--card-shadow);
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 24px 28px;
     }
-    .accounts-card-header { margin-bottom: 20px; }
+    .accounts-card-header { margin-bottom: 18px; }
     .acct-row {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 13px 0;
+      padding: 12px 0;
     }
     .acct-row + .acct-row { border-top: 1px solid rgba(255,255,255,0.04); }
     .acct-left { display: flex; align-items: center; gap: 12px; }
-    .acct-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .acct-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 15px;
+    }
     .acct-name { font-size: 13.5px; font-weight: 500; }
     .acct-type { font-size: 11px; color: var(--text-sub); margin-top: 1px; }
     .acct-bal { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
-    .acct-total {
+    .acct-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 8px 0; }
+    .acct-total-row {
       display: flex; align-items: center; justify-content: space-between;
-      padding-top: 16px; margin-top: 4px;
-      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 10px;
     }
     .acct-total-label { font-size: 12px; color: var(--text-sub); font-weight: 500; }
-    .acct-total-val {
-      font-size: 20px; font-weight: 700; letter-spacing: -0.5px;
-      font-variant-numeric: tabular-nums;
-    }
+    .acct-total-val { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; font-variant-numeric: tabular-nums; }
 
-    /* ── Drain section ── */
+    /* ── Drain / Spending breakdown ── */
     .drain-card {
-      background: var(--bg-card);
-      border-radius: var(--r); padding: 28px 32px;
-      box-shadow: var(--card-shadow); margin-bottom: 20px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 24px 28px; margin-bottom: 16px;
     }
     .drain-header {
       display: flex; align-items: flex-end; justify-content: space-between;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
-    .drain-total-label { font-size: 12.5px; color: var(--text-sub); }
-    .drain-total-val { font-size: 13px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
-    .drain-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .drain-total-label { font-size: 12px; color: var(--text-sub); }
+    .drain-total-val { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .drain-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .drain-item {
       background: rgba(255,255,255,0.025);
-      border-radius: 12px; padding: 16px;
+      border-radius: 12px; padding: 15px;
       transition: background 0.15s;
     }
-    .drain-item:hover { background: rgba(255,255,255,0.045); }
+    .drain-item:hover { background: rgba(255,255,255,0.04); }
     .drain-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
     .drain-left { display: flex; align-items: center; gap: 8px; }
-    .drain-icon { font-size: 15px; line-height: 1; }
-    .drain-name { font-size: 12.5px; font-weight: 500; }
+    .drain-icon { font-size: 14px; line-height: 1; }
+    .drain-name { font-size: 12px; font-weight: 500; }
     .drain-right { text-align: right; }
-    .drain-amt { font-size: 14px; font-weight: 700; letter-spacing: -0.3px; font-variant-numeric: tabular-nums; }
-    .drain-pct { font-size: 10.5px; color: var(--text-sub); margin-top: 1px; }
-    .drain-track { height: 2.5px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
-    .drain-fill { height: 100%; border-radius: 2px; width: 0%; transition: width 0.9s cubic-bezier(0.34,1.1,0.64,1) 0.25s; }
-    .drain-spk { opacity: 0.65; line-height: 0; }
+    .drain-amt { font-size: 13.5px; font-weight: 700; letter-spacing: -0.3px; font-variant-numeric: tabular-nums; }
+    .drain-pct { font-size: 10px; color: var(--text-sub); margin-top: 1px; }
+    .drain-track { height: 2.5px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; margin-bottom: 7px; }
+    .drain-fill { height: 100%; border-radius: 2px; width: 0%; transition: width 0.85s cubic-bezier(0.34,1.1,0.64,1) 0.25s; }
+    .drain-spk { opacity: 0.6; line-height: 0; }
 
     /* ── Transactions ── */
     .tx-card {
-      background: var(--bg-card);
-      border-radius: var(--r); padding: 28px 32px;
-      box-shadow: var(--card-shadow); margin-bottom: 20px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 24px 28px;
     }
     .tx-card-header {
       display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
     .tx-see-all { font-size: 12px; font-weight: 500; color: var(--accent); text-decoration: none; }
     .tx-see-all:hover { opacity: 0.75; }
     .tx-list-inner { list-style: none; }
     .tx-row {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 11px 0; gap: 16px;
+      padding: 10px 0; gap: 14px;
     }
     .tx-row + .tx-row { border-top: 1px solid rgba(255,255,255,0.04); }
     .tx-left { display: flex; align-items: center; gap: 11px; overflow: hidden; min-width: 0; }
     .tx-ico {
       width: 34px; height: 34px; border-radius: 9px;
-      background: rgba(255,255,255,0.04);
+      background: rgba(255,255,255,0.05);
       display: flex; align-items: center; justify-content: center;
       font-size: 14px; flex-shrink: 0;
     }
     .tx-merchant { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .tx-meta { font-size: 11px; color: var(--text-sub); margin-top: 1px; }
     .tx-amt { font-size: 13.5px; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
-    .tx-amt.neg { color: var(--rose); }
-    .tx-amt.pos { color: var(--mint); }
+    .tx-amt.neg { color: var(--red); }
+    .tx-amt.pos { color: var(--green); }
     .tx-empty { text-align: center; padding: 28px; color: var(--text-sub); font-size: 13px; }
 
     /* ── Link CTA ── */
     .link-cta {
       border-radius: calc(var(--r) + 1px);
-      padding: 1px;
-      background: linear-gradient(135deg, rgba(59,130,246,0.25), rgba(16,217,160,0.12));
+      padding: 1px; margin-top: 16px;
+      background: linear-gradient(135deg, rgba(91,110,245,0.3), rgba(6,214,160,0.12));
     }
     .link-cta-inner {
-      display: flex; align-items: center; gap: 16px;
-      background: var(--bg-card);
-      border-radius: var(--r);
-      padding: 18px 24px;
+      display: flex; align-items: center; gap: 14px;
+      background: var(--bg-card); border-radius: var(--r);
+      padding: 16px 22px;
     }
     .link-cta-icon {
-      width: 38px; height: 38px; border-radius: 9px;
+      width: 36px; height: 36px; border-radius: 9px;
       background: var(--accent-glow);
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
     .link-cta-text { flex: 1; }
     .link-cta-title { font-size: 13.5px; font-weight: 600; }
     .link-cta-sub { font-size: 11.5px; color: var(--text-sub); margin-top: 2px; }
     .btn-link-sm {
       display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(59,130,246,0.1); color: var(--accent);
-      font-size: 12.5px; font-weight: 600; padding: 9px 18px;
-      border-radius: 8px; border: 1px solid rgba(59,130,246,0.2);
+      background: rgba(91,110,245,0.12); color: var(--accent);
+      font-size: 12.5px; font-weight: 600; padding: 9px 16px;
+      border-radius: 8px; border: 1px solid rgba(91,110,245,0.22);
       cursor: pointer; font-family: inherit; white-space: nowrap;
-      transition: background 0.15s, border-color 0.15s;
+      transition: background 0.15s;
     }
-    .btn-link-sm:hover { background: rgba(59,130,246,0.18); border-color: rgba(59,130,246,0.35); }
+    .btn-link-sm:hover { background: rgba(91,110,245,0.2); }
     .btn-link-sm:disabled { opacity: 0.5; cursor: not-allowed; }
 
     /* ── Toast ── */
-    .toast-container { position: fixed; top: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
-    .toast { padding: 12px 18px; border-radius: 10px; font-size: 12.5px; font-weight: 500; backdrop-filter: blur(12px); max-width: 320px; animation: toastIn 0.3s ease both; }
+    .toast-container { position: fixed; top: 22px; right: 22px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+    .toast { padding: 11px 16px; border-radius: 10px; font-size: 12.5px; font-weight: 500; max-width: 300px; animation: toastIn 0.3s ease both; }
     .toast.fade-out { animation: toastOut 0.25s ease both; }
-    .toast.error   { background: rgba(244,63,94,0.12);  border: 1px solid rgba(244,63,94,0.22);  color: #FB7185; }
-    .toast.success { background: rgba(16,217,160,0.1);  border: 1px solid rgba(16,217,160,0.22); color: #10D9A0; }
-    .toast.info    { background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.22); color: #93C5FD; }
+    .toast.error   { background: rgba(255,71,87,0.12);  border: 1px solid rgba(255,71,87,0.2);  color: #FF6B78; }
+    .toast.success { background: rgba(6,214,160,0.1);   border: 1px solid rgba(6,214,160,0.2);  color: #06D6A0; }
+    .toast.info    { background: rgba(91,110,245,0.12); border: 1px solid rgba(91,110,245,0.22); color: #8B9CF8; }
 
     /* ── Spinner ── */
-    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.15); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; }
+    .spinner { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(255,255,255,0.15); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; }
 
-    /* ── Animations ── */
-    .reveal { opacity: 0; transform: translateY(10px); }
-    .reveal.in { opacity: 1; transform: translateY(0); transition: opacity 0.5s ease, transform 0.5s ease; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-    @keyframes toastIn { from { opacity: 0; transform: translateX(16px) scale(0.96); } to { opacity: 1; transform: none; } }
-    @keyframes toastOut { to { opacity: 0; transform: translateX(16px); } }
+    /* ── Reveal animation ── */
+    .reveal { opacity: 0; transform: translateY(12px); }
+    .reveal.in { opacity: 1; transform: translateY(0); transition: opacity 0.45s ease, transform 0.45s ease; }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+    @keyframes toastOut { to { opacity: 0; transform: translateX(14px); } }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ── Mobile ── */
-    @media (max-width: 960px) {
-      .hero-section { grid-template-columns: 1fr; }
-      .donut-card { flex-direction: row; align-items: center; gap: 28px; padding: 24px; }
-      .donut-svg-wrap { width: 150px; height: 150px; flex-shrink: 0; margin-bottom: 0; }
-      .drain-grid { grid-template-columns: 1fr; }
+    @media (max-width: 980px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .chart-card { flex-direction: row; gap: 24px; }
+      .pie-wrap { flex-shrink: 0; margin: 0; }
+      .pie-legend { flex: 1; }
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 768px) {
       .sidebar {
-        top: auto; left: 0; right: 0; bottom: 0; height: 60px;
+        top: auto; left: 0; right: 0; bottom: 0; height: 58px;
         width: 100%; flex-direction: row; align-items: center;
-        box-shadow: 0 -1px 0 rgba(255,255,255,0.05);
+        border-right: none; border-top: 1px solid var(--border);
         padding: 0 8px;
       }
-      .sidebar-logo { display: none; }
-      .sidebar-nav { flex-direction: row; gap: 0; padding: 0; justify-content: space-around; width: 100%; flex: 1; }
+      .sidebar-logo, .sidebar-bottom { display: none; }
+      .sidebar-nav { flex-direction: row; gap: 0; padding: 0; justify-content: space-around; width: 100%; }
       .nav-item { flex-direction: column; gap: 3px; padding: 8px 6px; font-size: 10px; align-items: center; border-radius: 8px; }
       .nav-svg { width: 18px; height: 18px; }
-      .sidebar-bottom { display: none; }
-      .main { margin-left: 0; padding: 24px 20px 80px; }
-    }
-    @media (max-width: 560px) {
+      .main { margin-left: 0; padding: 24px 18px 72px; }
+      .stats-bar { grid-template-columns: 1fr; gap: 10px; }
       .drain-grid { grid-template-columns: 1fr; }
     }
   </style>
@@ -373,93 +377,91 @@
     </a>
     <nav class="sidebar-nav">
       <a href="/dashboard.html" class="nav-item active">
-        <svg class="nav-svg" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-          <rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/>
-          <rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/>
-        </svg>
-        <span class="nav-label">Overview</span>
+        <svg class="nav-svg" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+        <span>Overview</span>
       </a>
       <a href="/transactions.html" class="nav-item">
-        <svg class="nav-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg">
-          <path d="M2 4.5h12M2 8h8M2 11.5h5"/><path d="M11 9.5l2.5 2-2.5 2"/>
-        </svg>
-        <span class="nav-label">Transactions</span>
+        <svg class="nav-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 4.5h12M2 8h8M2 11.5h5"/><path d="M11 9.5l2.5 2-2.5 2"/></svg>
+        <span>Transactions</span>
       </a>
       <a href="/savings.html" class="nav-item">
-        <svg class="nav-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
-          <rect x="2" y="5" width="12" height="9" rx="2"/><path d="M5 5V4a3 3 0 0 1 6 0v1"/>
-        </svg>
-        <span class="nav-label">Savings</span>
+        <svg class="nav-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="12" height="9" rx="2"/><path d="M5 5V4a3 3 0 0 1 6 0v1"/></svg>
+        <span>Savings</span>
       </a>
       <a href="/settings.html" class="nav-item">
-        <svg class="nav-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v1.3M8 13.2v1.3M1.5 8h1.3M13.2 8h1.3M3.4 3.4l.9.9M11.7 11.7l.9.9M3.4 12.6l.9-.9M11.7 4.3l.9-.9"/>
-        </svg>
-        <span class="nav-label">Settings</span>
+        <svg class="nav-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v1.3M8 13.2v1.3M1.5 8h1.3M13.2 8h1.3M3.4 3.4l.9.9M11.7 11.7l.9.9M3.4 12.6l.9-.9M11.7 4.3l.9-.9"/></svg>
+        <span>Settings</span>
       </a>
     </nav>
     <div class="sidebar-bottom">
       <div class="user-pill">
         <div class="user-avatar" id="user-avatar">?</div>
-        <div style="overflow:hidden">
+        <div style="overflow:hidden;min-width:0">
           <div class="user-name" id="user-name">—</div>
           <div class="user-email" id="user-email"></div>
         </div>
       </div>
       <button class="nav-item logout" onclick="handleLogout()">
-        <svg class="nav-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3M10 11l3-3-3-3M13 8H6"/>
-        </svg>
-        <span class="nav-label">Sign out</span>
+        <svg class="nav-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3M10 11l3-3-3-3M13 8H6"/></svg>
+        <span>Sign out</span>
       </button>
     </div>
   </aside>
 
   <main class="main" id="main">
 
-    <!-- Loading -->
+    <!-- Loading skeleton -->
     <div id="state-loading">
-      <div class="sk-line skeleton" style="height:28px;width:200px;margin-bottom:36px;"></div>
-      <div style="display:grid;grid-template-columns:300px 1fr;gap:20px;margin-bottom:20px;">
-        <div class="skeleton" style="height:300px;border-radius:16px;"></div>
-        <div class="skeleton" style="height:300px;border-radius:16px;"></div>
+      <div class="skeleton" style="height:22px;width:180px;margin-bottom:32px;"></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">
+        <div class="skeleton" style="height:88px;"></div>
+        <div class="skeleton" style="height:88px;"></div>
+        <div class="skeleton" style="height:88px;"></div>
       </div>
-      <div class="skeleton" style="height:220px;border-radius:16px;margin-bottom:20px;"></div>
-      <div class="skeleton" style="height:280px;border-radius:16px;"></div>
+      <div style="display:grid;grid-template-columns:310px 1fr;gap:16px;margin-bottom:16px;">
+        <div class="skeleton" style="height:340px;"></div>
+        <div class="skeleton" style="height:340px;"></div>
+      </div>
+      <div class="skeleton" style="height:190px;margin-bottom:16px;"></div>
+      <div class="skeleton" style="height:260px;"></div>
     </div>
 
     <!-- Empty state -->
     <div id="state-empty" class="hidden">
-      <div class="empty-hero">
+      <div class="empty-wrap">
         <div class="empty-illo">
-          <svg width="210" height="170" viewBox="0 0 210 170" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="105" cy="84" r="76" fill="rgba(59,130,246,0.035)"/>
-            <circle cx="105" cy="84" r="56" stroke="rgba(59,130,246,0.13)" stroke-width="15" stroke-dasharray="4.8 4.8"/>
-            <circle cx="105" cy="84" r="41" stroke="rgba(255,255,255,0.035)" stroke-width="1"/>
-            <rect x="56" y="142" width="10" height="12" rx="5" fill="rgba(59,130,246,0.1)"/>
-            <rect x="72" y="134" width="10" height="20" rx="5" fill="rgba(59,130,246,0.16)"/>
-            <rect x="88" y="126" width="10" height="28" rx="5" fill="rgba(59,130,246,0.22)"/>
-            <rect x="104" y="131" width="10" height="23" rx="5" fill="rgba(16,217,160,0.16)"/>
-            <rect x="120" y="137" width="10" height="17" rx="5" fill="rgba(16,217,160,0.1)"/>
-            <circle cx="52" cy="48" r="3" fill="rgba(59,130,246,0.28)"/>
-            <circle cx="162" cy="34" r="2" fill="rgba(16,217,160,0.28)"/>
-            <circle cx="168" cy="62" r="4" fill="rgba(139,92,246,0.18)"/>
-            <circle cx="42" cy="104" r="2.5" fill="rgba(251,146,60,0.18)"/>
-            <rect x="87" y="77" width="36" height="5" rx="2.5" fill="rgba(255,255,255,0.07)"/>
-            <rect x="93" y="88" width="24" height="4" rx="2" fill="rgba(255,255,255,0.045)"/>
+          <svg width="200" height="165" viewBox="0 0 200 165" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="80" r="70" fill="rgba(91,110,245,0.04)"/>
+            <circle cx="100" cy="80" r="52" stroke="rgba(91,110,245,0.18)" stroke-width="14" stroke-dasharray="5 5" stroke-linecap="round"/>
+            <circle cx="100" cy="80" r="37" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <!-- Bar chart ghost -->
+            <rect x="50" y="136" width="9" height="11" rx="4.5" fill="rgba(91,110,245,0.1)"/>
+            <rect x="65" y="128" width="9" height="19" rx="4.5" fill="rgba(91,110,245,0.17)"/>
+            <rect x="80" y="120" width="9" height="27" rx="4.5" fill="rgba(91,110,245,0.24)"/>
+            <rect x="95" y="124" width="9" height="23" rx="4.5" fill="rgba(6,214,160,0.17)"/>
+            <rect x="110" y="131" width="9" height="16" rx="4.5" fill="rgba(6,214,160,0.11)"/>
+            <rect x="125" y="135" width="9" height="12" rx="4.5" fill="rgba(91,110,245,0.1)"/>
+            <!-- Floating dots -->
+            <circle cx="44" cy="44" r="3" fill="rgba(91,110,245,0.3)"/>
+            <circle cx="158" cy="30" r="2" fill="rgba(6,214,160,0.28)"/>
+            <circle cx="164" cy="58" r="3.5" fill="rgba(139,92,246,0.18)"/>
+            <circle cx="38" cy="102" r="2.5" fill="rgba(255,71,87,0.18)"/>
+            <!-- Center ghost text -->
+            <rect x="83" y="73" width="34" height="5" rx="2.5" fill="rgba(255,255,255,0.07)"/>
+            <rect x="89" y="83" width="22" height="4" rx="2" fill="rgba(255,255,255,0.04)"/>
           </svg>
         </div>
-        <h2>Your financial picture,<br>waiting to be drawn.</h2>
-        <p>Connect your bank account to see balances, spending patterns, and insights — all in one clean view.</p>
-        <button class="btn-connect-hero" id="empty-connect-btn" onclick="connectBank('empty')">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        <h2>Your finances,<br>at a glance.</h2>
+        <p>Connect your bank account to see your balances, spending breakdown, and smart insights — all in one place.</p>
+        <button class="btn-primary" id="empty-connect-btn" onclick="connectBank('empty')">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>
           Connect Bank Account
         </button>
         <p class="empty-trust">256-bit encryption · Read-only access · Powered by Plaid</p>
       </div>
     </div>
 
-    <!-- Data view -->
+    <!-- Full dashboard -->
     <div id="state-data" class="hidden">
 
       <div class="page-header reveal">
@@ -467,40 +469,66 @@
         <div class="greeting-sub" id="greeting-sub"></div>
       </div>
 
-      <div class="hero-section">
-        <div class="donut-card reveal">
-          <div class="donut-svg-wrap" id="donut-svg-wrap">
-            <div class="donut-center" id="donut-default">
-              <div class="donut-center-label">Total</div>
-              <div class="donut-center-value" id="donut-total">—</div>
+      <!-- Stats row -->
+      <div class="stats-bar">
+        <div class="stat-card reveal">
+          <div class="stat-label">Total Balance</div>
+          <div class="stat-value" id="stat-total">—</div>
+        </div>
+        <div class="stat-card reveal">
+          <div class="stat-label">Spent (30 days)</div>
+          <div class="stat-value" id="stat-spent" style="color:var(--red)">—</div>
+        </div>
+        <div class="stat-card reveal">
+          <div class="stat-label">Income (30 days)</div>
+          <div class="stat-value" id="stat-income" style="color:var(--green)">—</div>
+        </div>
+      </div>
+
+      <!-- Hero: Pie chart + Accounts -->
+      <div class="hero-grid">
+
+        <!-- Pie chart card -->
+        <div class="chart-card reveal">
+          <div class="card-title-row">
+            <div class="card-eyebrow">Spending</div>
+            <div class="card-title">By category</div>
+          </div>
+          <div class="pie-wrap" id="pie-wrap">
+            <div class="pie-center" id="pie-default">
+              <div class="pie-center-label">Total Spent</div>
+              <div class="pie-center-value" id="pie-total">—</div>
             </div>
-            <div class="donut-hover" id="donut-hover">
-              <div class="hov-name" id="hov-name"></div>
-              <div class="hov-val" id="hov-val"></div>
-              <div class="hov-pct" id="hov-pct"></div>
+            <div class="pie-hover" id="pie-hover">
+              <div class="phov-name" id="phov-name"></div>
+              <div class="phov-val" id="phov-val"></div>
+              <div class="phov-pct" id="phov-pct"></div>
             </div>
           </div>
-          <div class="donut-legend" id="donut-legend"></div>
+          <div class="pie-legend" id="pie-legend"></div>
         </div>
 
+        <!-- Accounts card -->
         <div class="accounts-card reveal">
           <div class="accounts-card-header">
-            <div class="eyebrow">Your accounts</div>
-            <div class="section-title">Asset breakdown</div>
+            <div class="card-eyebrow">Connected banks</div>
+            <div class="card-title">Your accounts</div>
           </div>
           <div id="accounts-list"></div>
-          <div class="acct-total">
-            <span class="acct-total-label">Total balance</span>
+          <div class="acct-divider"></div>
+          <div class="acct-total-row">
+            <span class="acct-total-label">Net worth</span>
             <span class="acct-total-val" id="acct-total-val">—</span>
           </div>
         </div>
       </div>
 
+      <!-- Spending breakdown -->
       <div class="drain-card reveal" id="drain-card">
         <div class="drain-header">
           <div>
-            <div class="eyebrow">Last 30 days</div>
-            <div class="section-title">Where it goes</div>
+            <div class="card-eyebrow">Last 30 days</div>
+            <div class="card-title">Where it goes</div>
           </div>
           <div>
             <div class="drain-total-label">Total spent</div>
@@ -510,25 +538,27 @@
         <div class="drain-grid" id="drain-grid"></div>
       </div>
 
+      <!-- Transactions -->
       <div class="tx-card reveal">
         <div class="tx-card-header">
           <div>
-            <div class="eyebrow">Latest</div>
-            <div class="section-title">Recent activity</div>
+            <div class="card-eyebrow">Latest</div>
+            <div class="card-title">Recent activity</div>
           </div>
           <a href="/transactions.html" class="tx-see-all">See all →</a>
         </div>
         <div id="tx-list"></div>
       </div>
 
+      <!-- Add account CTA -->
       <div class="link-cta reveal" id="link-cta">
         <div class="link-cta-inner">
           <div class="link-cta-icon">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="#3B82F6" stroke-width="2.2" stroke-linecap="round"/></svg>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="#5B6EF5" stroke-width="2.2" stroke-linecap="round"/></svg>
           </div>
           <div class="link-cta-text">
             <div class="link-cta-title">Add another account</div>
-            <div class="link-cta-sub">Connect more banks for a complete financial picture</div>
+            <div class="link-cta-sub">Connect more banks for a complete picture</div>
           </div>
           <button class="btn-link-sm" id="link-cta-btn" onclick="connectBank('cta')">Link Account</button>
         </div>
@@ -552,7 +582,7 @@
 
     function navigateTo(url) {
       document.body.classList.add('fade-out');
-      setTimeout(() => { window.location.href = url; }, 250);
+      setTimeout(() => { window.location.href = url; }, 220);
     }
   </script>
   <script src="dashboard.js"></script>
