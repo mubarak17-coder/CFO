@@ -95,16 +95,28 @@
     .content {
       margin-left: var(--sidebar-w);
       padding: 0 32px 48px;
-      max-width: calc(960px + var(--sidebar-w));
       min-height: 100vh;
     }
+
+    /* ── Top 2-col layout: ring left, assets right ── */
+    .dash-top {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+      padding-top: 28px;
+      margin-bottom: 20px;
+      align-items: start;
+    }
+    .dash-left { display: flex; flex-direction: column; gap: 16px; }
+    .dash-right { display: flex; flex-direction: column; gap: 16px; }
 
     /* ── Hero ring ── */
     .hero {
       display: flex; flex-direction: column;
-      align-items: center; padding: 40px 0 28px;
+      align-items: center; padding: 24px 0 20px;
+      background: var(--bg-card); border-radius: 16px;
     }
-    .ring-wrap { position: relative; width: 260px; height: 260px; }
+    .ring-wrap { position: relative; width: 220px; height: 220px; }
     .ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
     .ring-bg { fill: none; stroke: #222; stroke-width: 18; }
     .ring-fill {
@@ -125,12 +137,12 @@
 
     /* ── Stats row ── */
     .stats-row {
-      display: flex; gap: 12px; justify-content: center;
-      margin-top: 20px; flex-wrap: wrap;
+      display: flex; gap: 10px; justify-content: center;
+      margin-top: 16px; flex-wrap: wrap; width: 100%;
     }
     .stat-pill {
-      background: var(--bg-card); border-radius: 12px;
-      padding: 12px 20px; text-align: center; min-width: 130px;
+      background: var(--bg-card-2); border-radius: 12px;
+      padding: 11px 16px; text-align: center; flex: 1;
     }
     .stat-pill-label { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
     .stat-pill-value { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
@@ -141,7 +153,6 @@
       border: 1px solid rgba(108,92,231,0.2);
       border-radius: 16px; padding: 18px 20px;
       display: flex; align-items: center; justify-content: space-between;
-      margin: 24px 0 20px;
     }
     .connect-banner-text h3 { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
     .connect-banner-text p { font-size: 12px; color: var(--text-muted); }
@@ -149,7 +160,7 @@
     /* ── Asset list ── */
     .asset-card {
       background: var(--bg-card); border-radius: 16px;
-      overflow: hidden; margin-bottom: 20px;
+      overflow: hidden;
     }
     .asset-item {
       display: flex; align-items: center;
@@ -173,8 +184,8 @@
 
     /* ── Main grid (transactions + categories) ── */
     .main-grid {
-      display: grid; grid-template-columns: 1.6fr 1fr;
-      gap: 16px; margin-bottom: 16px;
+      display: grid; grid-template-columns: 1.5fr 1fr;
+      gap: 14px;
     }
 
     /* ── Cards ── */
@@ -291,7 +302,14 @@
     @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
     @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateX(40px); } }
 
-    /* ── Mobile ── */
+    /* ── Responsive ── */
+    @media (max-width: 1100px) {
+      .dash-top { grid-template-columns: 260px 1fr; }
+    }
+    @media (max-width: 900px) {
+      .dash-top { grid-template-columns: 1fr; }
+      .main-grid { grid-template-columns: 1fr; }
+    }
     @media (max-width: 768px) {
       .sidebar {
         top: auto; bottom: 0; left: 0; right: 0;
@@ -307,9 +325,8 @@
       .nav-tooltip { display: none; }
       .sidebar-bottom { display: none; }
       .content { margin-left: 0; padding: 0 16px 84px; }
-      .main-grid { grid-template-columns: 1fr; }
-      .hero { padding: 28px 0 20px; }
-      .ring-wrap { width: 220px; height: 220px; }
+      .hero { padding: 20px 0 16px; }
+      .ring-wrap { width: 200px; height: 200px; }
       .ring-value { font-size: 28px; }
       .connect-banner { flex-direction: column; gap: 12px; text-align: center; }
     }
@@ -352,115 +369,121 @@
   <!-- Content -->
   <div class="content">
 
-    <!-- Hero ring -->
-    <div class="hero">
-      <div class="ring-wrap">
-        <svg class="ring-svg" viewBox="0 0 260 260">
-          <defs>
-            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#6C5CE7"/>
-              <stop offset="50%" stop-color="#00B4D8"/>
-              <stop offset="100%" stop-color="#00D4FF"/>
-            </linearGradient>
-          </defs>
-          <circle class="ring-bg" cx="130" cy="130" r="105"/>
-          <circle class="ring-fill" cx="130" cy="130" r="105" stroke="url(#ringGrad)" id="ring-progress"/>
-        </svg>
-        <div class="ring-center">
-          <div class="ring-label">Total assets</div>
-          <div class="ring-value" id="total-balance"><span class="skeleton skeleton-val"></span></div>
-          <div class="ring-sub" id="accounts-count">Loading...</div>
+    <!-- Top 2-col: ring left | assets right -->
+    <div class="dash-top">
+      <div class="dash-left">
+        <!-- Hero ring -->
+        <div class="hero">
+          <div class="ring-wrap">
+            <svg class="ring-svg" viewBox="0 0 260 260">
+              <defs>
+                <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#6C5CE7"/>
+                  <stop offset="50%" stop-color="#00B4D8"/>
+                  <stop offset="100%" stop-color="#00D4FF"/>
+                </linearGradient>
+              </defs>
+              <circle class="ring-bg" cx="130" cy="130" r="105"/>
+              <circle class="ring-fill" cx="130" cy="130" r="105" stroke="url(#ringGrad)" id="ring-progress"/>
+            </svg>
+            <div class="ring-center">
+              <div class="ring-label">Total assets</div>
+              <div class="ring-value" id="total-balance"><span class="skeleton skeleton-val"></span></div>
+              <div class="ring-sub" id="accounts-count">Loading...</div>
+            </div>
+          </div>
+          <!-- Stats pills -->
+          <div class="stats-row">
+            <div class="stat-pill">
+              <div class="stat-pill-label">Monthly spend</div>
+              <div class="stat-pill-value" id="monthly-spending"><span class="skeleton" style="height:20px;width:70px;display:inline-block;border-radius:5px;"></span></div>
+            </div>
+            <div class="stat-pill">
+              <div class="stat-pill-label">Transactions</div>
+              <div class="stat-pill-value" id="tx-count"><span class="skeleton" style="height:20px;width:36px;display:inline-block;border-radius:5px;"></span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Savings Lockbox -->
+        <div class="lockbox-card">
+          <div class="lockbox-header">
+            <div class="lockbox-title">Savings Lockbox</div>
+            <button class="btn-outline" onclick="editGoal()">Edit Goal</button>
+          </div>
+          <div class="lockbox-amounts">
+            <span class="lockbox-current" id="lockbox-current">$0.00</span>
+            <span class="lockbox-goal" id="lockbox-goal">of $5,000.00 goal</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="lockbox-progress" style="width:0%"></div>
+          </div>
+          <div class="progress-label" id="lockbox-percent">0% reached</div>
+          <div class="lockbox-actions">
+            <input type="number" class="lockbox-input" id="lockbox-amount" placeholder="Amount to save" min="0" step="0.01" />
+            <button class="btn-primary" onclick="addToLockbox()">Add</button>
+          </div>
         </div>
       </div>
 
-      <!-- Stats pills -->
-      <div class="stats-row">
-        <div class="stat-pill">
-          <div class="stat-pill-label">Monthly spend</div>
-          <div class="stat-pill-value" id="monthly-spending"><span class="skeleton" style="height:22px;width:80px;display:inline-block;border-radius:5px;"></span></div>
+      <div class="dash-right">
+        <!-- Connect banner -->
+        <div class="connect-banner" id="connect-banner">
+          <div class="connect-banner-text">
+            <h3 id="connect-title">Connect your bank</h3>
+            <p id="connect-desc">Link your bank to see balance, transactions, and insights.</p>
+          </div>
+          <button class="btn-primary" id="connect-btn" onclick="connectBank()">Connect Bank</button>
         </div>
-        <div class="stat-pill">
-          <div class="stat-pill-label">Transactions</div>
-          <div class="stat-pill-value" id="tx-count"><span class="skeleton" style="height:22px;width:40px;display:inline-block;border-radius:5px;"></span></div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Connect banner -->
-    <div class="connect-banner" id="connect-banner">
-      <div class="connect-banner-text">
-        <h3 id="connect-title">Connect your bank</h3>
-        <p id="connect-desc">Link your bank to see balance, transactions, and insights.</p>
-      </div>
-      <button class="btn-primary" id="connect-btn" onclick="connectBank()">Connect Bank</button>
-    </div>
+        <!-- Asset list -->
+        <div class="asset-card">
+          <div class="asset-item">
+            <div class="asset-icon" style="background:#3A36DB;">💳</div>
+            <div class="asset-info">
+              <div class="asset-name">Cash</div>
+              <div class="asset-sub" id="asset-sub">—</div>
+            </div>
+            <div class="asset-right">
+              <div class="asset-amount" id="asset-balance">—</div>
+              <div class="asset-pct">100%</div>
+            </div>
+          </div>
+          <div class="asset-item">
+            <div class="asset-icon" style="background:#FF9F0A;">🎯</div>
+            <div class="asset-info">
+              <div class="asset-name">Savings Lockbox</div>
+              <div class="asset-sub">Goal tracker</div>
+            </div>
+            <div class="asset-right">
+              <div class="asset-amount" id="asset-savings">$0.00</div>
+            </div>
+          </div>
+        </div>
 
-    <!-- Asset list -->
-    <div class="asset-card">
-      <div class="asset-item">
-        <div class="asset-icon" style="background:#3A36DB;">💳</div>
-        <div class="asset-info">
-          <div class="asset-name">Cash</div>
-          <div class="asset-sub" id="asset-sub">—</div>
+        <!-- Transactions + Categories -->
+        <div class="main-grid">
+          <div class="card">
+            <div class="card-title">
+              Transactions
+              <span class="card-title-sub" id="tx-showing"></span>
+            </div>
+            <div id="tx-list">
+              <div class="skeleton skeleton-tx"></div>
+              <div class="skeleton skeleton-tx"></div>
+              <div class="skeleton skeleton-tx"></div>
+              <div class="skeleton skeleton-tx"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">By Category</div>
+            <div id="cat-chart">
+              <div class="skeleton skeleton-tx"></div>
+              <div class="skeleton skeleton-tx"></div>
+              <div class="skeleton skeleton-tx"></div>
+            </div>
+          </div>
         </div>
-        <div class="asset-right">
-          <div class="asset-amount" id="asset-balance">—</div>
-          <div class="asset-pct">100%</div>
-        </div>
-      </div>
-      <div class="asset-item">
-        <div class="asset-icon" style="background:#FF9F0A;">🎯</div>
-        <div class="asset-info">
-          <div class="asset-name">Savings Lockbox</div>
-          <div class="asset-sub">Goal tracker</div>
-        </div>
-        <div class="asset-right">
-          <div class="asset-amount" id="asset-savings">$0.00</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Transactions + Categories -->
-    <div class="main-grid">
-      <div class="card">
-        <div class="card-title">
-          Transactions
-          <span class="card-title-sub" id="tx-showing"></span>
-        </div>
-        <div id="tx-list">
-          <div class="skeleton skeleton-tx"></div>
-          <div class="skeleton skeleton-tx"></div>
-          <div class="skeleton skeleton-tx"></div>
-          <div class="skeleton skeleton-tx"></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">By Category</div>
-        <div id="cat-chart">
-          <div class="skeleton skeleton-tx"></div>
-          <div class="skeleton skeleton-tx"></div>
-          <div class="skeleton skeleton-tx"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Savings Lockbox -->
-    <div class="lockbox-card">
-      <div class="lockbox-header">
-        <div class="lockbox-title">Savings Lockbox</div>
-        <button class="btn-outline" onclick="editGoal()">Edit Goal</button>
-      </div>
-      <div class="lockbox-amounts">
-        <span class="lockbox-current" id="lockbox-current">$0.00</span>
-        <span class="lockbox-goal" id="lockbox-goal">of $5,000.00 goal</span>
-      </div>
-      <div class="progress-track">
-        <div class="progress-fill" id="lockbox-progress" style="width:0%"></div>
-      </div>
-      <div class="progress-label" id="lockbox-percent">0% reached</div>
-      <div class="lockbox-actions">
-        <input type="number" class="lockbox-input" id="lockbox-amount" placeholder="Amount to save" min="0" step="0.01" />
-        <button class="btn-primary" onclick="addToLockbox()">Add</button>
       </div>
     </div>
 
