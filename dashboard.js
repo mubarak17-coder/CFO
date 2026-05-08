@@ -195,19 +195,34 @@ async function loadDashboardData() {
   }
 }
 
+// ── Animate SVG ring ──
+function animateRing() {
+  const ring = document.getElementById('ring-progress');
+  if (!ring) return;
+  const circumference = 659.73; // 2 * PI * 105
+  setTimeout(() => { ring.style.strokeDashoffset = 0; }, 100);
+}
+
 // ── Render balances ──
 function renderBalances(data) {
   const total = data.total_balance || 0;
   const count = (data.accounts || []).length;
 
-  countUp(
-    document.getElementById('total-balance'),
-    total,
-    1200,
-    v => formatCurrency(v)
-  );
-  document.getElementById('accounts-count').textContent =
-    count > 0 ? `${count} account${count > 1 ? 's' : ''} connected` : 'No accounts connected';
+  countUp(document.getElementById('total-balance'), total, 1200, v => formatCurrency(v));
+  animateRing();
+
+  const subText = count > 0 ? `${count} account${count > 1 ? 's' : ''} connected` : 'No accounts connected';
+  document.getElementById('accounts-count').textContent = subText;
+
+  // Update asset list row
+  const assetSub = document.getElementById('asset-sub');
+  const assetBalance = document.getElementById('asset-balance');
+  if (assetSub) assetSub.textContent = count > 0 ? `${count} account${count > 1 ? 's' : ''}` : 'No accounts';
+  if (assetBalance) assetBalance.textContent = formatCurrency(total);
+
+  // Update savings asset row
+  const assetSavings = document.getElementById('asset-savings');
+  if (assetSavings) assetSavings.textContent = formatCurrency(getLockbox());
 
   if (count > 0) {
     bankConnected = true;
@@ -221,15 +236,39 @@ let allTransactions = [];
 let txPage = 0;
 const TX_PER_PAGE = 10;
 
+function getTxIcon(name, category) {
+  const n = (name || '').toLowerCase();
+  if (n.includes('uber') || n.includes('lyft') || n.includes('taxi')) return '🚗';
+  if (n.includes('mcdonald') || n.includes('burger') || n.includes('kfc') || n.includes('wendy')) return '🍔';
+  if (n.includes('starbucks') || n.includes('coffee') || n.includes('cafe')) return '☕';
+  if (n.includes('amazon') || n.includes('ebay') || n.includes('shop')) return '🛍️';
+  if (n.includes('netflix') || n.includes('spotify') || n.includes('apple') || n.includes('google play')) return '📱';
+  if (n.includes('airline') || n.includes('flight') || n.includes('united') || n.includes('delta')) return '✈️';
+  if (n.includes('hotel') || n.includes('airbnb') || n.includes('marriott')) return '🏨';
+  if (n.includes('gym') || n.includes('fitness') || n.includes('sport')) return '💪';
+  if (n.includes('pharmacy') || n.includes('cvs') || n.includes('walgreen')) return '💊';
+  if (n.includes('pizza') || n.includes('restaurant') || n.includes('sushi')) return '🍽️';
+  const cat = ((category && category[0]) || '').toLowerCase();
+  if (cat.includes('food') || cat.includes('dining')) return '🍽️';
+  if (cat.includes('travel') || cat.includes('transport')) return '✈️';
+  if (cat.includes('shopping')) return '🛍️';
+  if (cat.includes('health') || cat.includes('medical')) return '💊';
+  if (cat.includes('entertainment')) return '🎬';
+  if (cat.includes('bill') || cat.includes('util')) return '📄';
+  return '💳';
+}
+
 function renderTxItem(tx) {
   const isNeg = tx.amount > 0;
   const merchant = escapeHtml(tx.merchant_name || tx.name || 'Unknown');
   const categories = escapeHtml((tx.category || []).join(', ') || 'Uncategorized');
+  const icon = getTxIcon(tx.merchant_name || tx.name || '', tx.category);
   return `
     <div class="tx-item">
-      <div class="tx-left">
-        <span class="tx-merchant">${merchant}</span>
-        <span class="tx-meta">${escapeHtml(formatDate(tx.date))} · ${categories}</span>
+      <div class="tx-icon">${icon}</div>
+      <div class="tx-info">
+        <div class="tx-merchant">${merchant}</div>
+        <div class="tx-meta">${escapeHtml(formatDate(tx.date))} · ${categories}</div>
       </div>
       <span class="tx-amount ${isNeg ? 'negative' : 'positive'}">${isNeg ? '-' : '+'}${formatCurrency(Math.abs(tx.amount))}</span>
     </div>

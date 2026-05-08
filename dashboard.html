@@ -6,22 +6,22 @@
   <title>Dashboard — Holdwise</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --bg: #0A0F1E;
-      --bg-card: #111827;
-      --bg-sidebar: #0F1F3D;
-      --border: rgba(255,255,255,0.08);
-      --text: #FFFFFF;
-      --text-muted: rgba(255,255,255,0.5);
-      --accent: #1A56DB;
-      --cyan: #00D4FF;
-      --green: #28C840;
-      --red: #FF5555;
-      --yellow: #FFB800;
-      --sidebar-w: 240px;
+      --bg: #000;
+      --bg-card: #1C1C1E;
+      --bg-card-2: #2C2C2E;
+      --border: rgba(255,255,255,0.07);
+      --text: #fff;
+      --text-muted: rgba(255,255,255,0.45);
+      --accent: #6C5CE7;
+      --accent-2: #00D4FF;
+      --green: #30D158;
+      --red: #FF453A;
+      --orange: #FF9F0A;
+      --sidebar-w: 72px;
     }
     body {
       font-family: 'Inter', sans-serif;
@@ -39,230 +39,259 @@
     .sidebar {
       position: fixed; top: 0; left: 0; bottom: 0;
       width: var(--sidebar-w);
-      background: var(--bg-sidebar);
+      background: #111;
       border-right: 1px solid var(--border);
       display: flex; flex-direction: column;
+      align-items: center;
       z-index: 100;
       transition: transform 0.3s ease;
     }
     .sidebar-logo {
-      display: flex; align-items: center; gap: 10px;
-      padding: 24px 20px 32px;
+      padding: 24px 0 28px;
+      display: flex; justify-content: center;
       text-decoration: none;
     }
-    .sidebar-logo .logo-icon {
+    .logo-icon {
       width: 36px; height: 36px;
-      background: linear-gradient(135deg, var(--cyan), var(--accent));
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
       border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 16px; font-weight: 900; color: #fff;
-      flex-shrink: 0;
+      font-size: 15px; font-weight: 900; color: #fff;
     }
-    .sidebar-logo .logo-text {
-      font-size: 18px; font-weight: 700; color: var(--text);
+    .sidebar-nav {
+      flex: 1; display: flex; flex-direction: column;
+      gap: 4px; width: 100%; padding: 0 8px;
     }
-
-    .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 0 12px; }
     .nav-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 14px; border-radius: 10px;
-      color: var(--text-muted); font-size: 14px; font-weight: 500;
-      text-decoration: none; cursor: pointer;
-      border: none; background: none; font-family: inherit;
-      width: 100%; text-align: left;
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; padding: 13px 0;
+      border-radius: 12px;
+      color: var(--text-muted);
+      text-decoration: none;
+      border: none; background: none;
+      cursor: pointer; font-family: inherit;
       transition: color 0.2s, background 0.2s;
+      position: relative;
     }
-    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-    .nav-item.active {
-      color: #fff;
-      background: var(--accent);
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+    .nav-item.active { color: var(--text); background: rgba(255,255,255,0.1); }
+    .nav-icon { font-size: 20px; line-height: 1; }
+    .nav-tooltip {
+      position: absolute; left: calc(100% + 10px);
+      background: var(--bg-card); color: var(--text);
+      font-size: 12px; font-weight: 600;
+      padding: 5px 10px; border-radius: 8px;
+      white-space: nowrap; pointer-events: none;
+      opacity: 0; transition: opacity 0.15s;
+      border: 1px solid var(--border);
+      z-index: 200;
     }
-    .nav-item .nav-icon { font-size: 18px; width: 24px; text-align: center; line-height: 1; }
-    .nav-item .nav-label { white-space: nowrap; }
-
-    .sidebar-bottom {
-      padding: 16px 12px 24px;
-      border-top: 1px solid var(--border);
-      margin-top: auto;
-    }
+    .nav-item:hover .nav-tooltip { opacity: 1; }
+    .sidebar-bottom { padding: 16px 8px 24px; width: 100%; }
     .nav-item.logout { color: var(--red); }
-    .nav-item.logout:hover { background: rgba(255,85,85,0.1); }
+    .nav-item.logout:hover { background: rgba(255,67,58,0.1); color: var(--red); }
 
-    /* ── Content Area ── */
+    /* ── Content ── */
     .content {
       margin-left: var(--sidebar-w);
-      padding: 32px 32px 40px;
-      max-width: calc(1100px + var(--sidebar-w));
+      padding: 0 32px 48px;
+      max-width: calc(960px + var(--sidebar-w));
       min-height: 100vh;
     }
-    .page-title { font-size: 24px; font-weight: 700; margin-bottom: 24px; }
 
-    /* ── Grid ── */
-    .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-
-    /* ── Cards ── */
-    .card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 14px; padding: 24px;
-      transition: border-color 0.2s;
+    /* ── Hero ring ── */
+    .hero {
+      display: flex; flex-direction: column;
+      align-items: center; padding: 40px 0 28px;
     }
-    .card:hover { border-color: rgba(255,255,255,0.12); }
-    .card-label { font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 8px; }
-    .card-value { font-size: 28px; font-weight: 700; }
-    .card-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-
-    .card-balance {
-      background: linear-gradient(135deg, #111827 0%, rgba(26,86,219,0.08) 100%);
-      border-color: rgba(26,86,219,0.2);
+    .ring-wrap { position: relative; width: 260px; height: 260px; }
+    .ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .ring-bg { fill: none; stroke: #222; stroke-width: 18; }
+    .ring-fill {
+      fill: none; stroke-width: 18; stroke-linecap: round;
+      stroke-dasharray: 659.73;
+      stroke-dashoffset: 659.73;
+      transition: stroke-dashoffset 1.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .card-balance .card-value {
-      background: linear-gradient(135deg, var(--text), var(--cyan));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .ring-center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
     }
+    .ring-label { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 6px; letter-spacing: 0.3px; }
+    .ring-value { font-size: 34px; font-weight: 800; letter-spacing: -1.5px; min-height: 42px; display: flex; align-items: center; }
+    .ring-sub { font-size: 12px; color: var(--text-muted); margin-top: 5px; }
 
-    /* ── Two-column ── */
-    .two-col { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 24px; }
+    /* ── Stats row ── */
+    .stats-row {
+      display: flex; gap: 12px; justify-content: center;
+      margin-top: 20px; flex-wrap: wrap;
+    }
+    .stat-pill {
+      background: var(--bg-card); border-radius: 12px;
+      padding: 12px 20px; text-align: center; min-width: 130px;
+    }
+    .stat-pill-label { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .stat-pill-value { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
 
-    /* ── Transactions ── */
-    .card-title {
-      font-size: 16px; font-weight: 600; margin-bottom: 16px;
+    /* ── Connect banner ── */
+    .connect-banner {
+      background: linear-gradient(135deg, rgba(108,92,231,0.15), rgba(0,212,255,0.08));
+      border: 1px solid rgba(108,92,231,0.2);
+      border-radius: 16px; padding: 18px 20px;
       display: flex; align-items: center; justify-content: space-between;
+      margin: 24px 0 20px;
     }
-    .tx-scroll { max-height: 520px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; }
-    .tx-scroll::-webkit-scrollbar { width: 4px; }
-    .tx-scroll::-webkit-scrollbar-track { background: transparent; }
-    .tx-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-    .tx-list { list-style: none; }
-    .tx-item {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 0; border-bottom: 1px solid var(--border);
+    .connect-banner-text h3 { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+    .connect-banner-text p { font-size: 12px; color: var(--text-muted); }
+
+    /* ── Asset list ── */
+    .asset-card {
+      background: var(--bg-card); border-radius: 16px;
+      overflow: hidden; margin-bottom: 20px;
+    }
+    .asset-item {
+      display: flex; align-items: center;
+      padding: 15px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
       transition: background 0.15s;
     }
-    .tx-item:last-child { border-bottom: none; }
-    .tx-left { display: flex; flex-direction: column; gap: 2px; }
-    .tx-merchant { font-size: 14px; font-weight: 500; }
-    .tx-meta { font-size: 12px; color: var(--text-muted); }
-    .tx-amount { font-size: 14px; font-weight: 600; white-space: nowrap; }
-    .tx-amount.negative { color: var(--red); }
-    .tx-amount.positive { color: var(--green); }
-    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
-
-    /* ── Category chart ── */
-    .cat-bar-group { margin-bottom: 14px; }
-    .cat-bar-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
-    .cat-bar-label span:first-child { font-weight: 500; }
-    .cat-bar-label span:last-child { color: var(--text-muted); }
-    .cat-bar-track { height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
-    .cat-bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
-
-    /* ── Lockbox (overview) ── */
-    .lockbox-section { margin-bottom: 24px; }
-    .lockbox-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; }
-    .lockbox-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .lockbox-amounts { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
-    .lockbox-current { font-size: 28px; font-weight: 700; color: var(--green); }
-    .lockbox-goal { font-size: 14px; color: var(--text-muted); }
-    .progress-track { height: 10px; background: rgba(255,255,255,0.06); border-radius: 5px; overflow: hidden; margin-bottom: 8px; }
-    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--cyan)); border-radius: 5px; transition: width 0.5s ease; }
-    .progress-label { font-size: 12px; color: var(--text-muted); text-align: right; }
-    .lockbox-actions { display: flex; gap: 10px; margin-top: 16px; }
-    .lockbox-input {
-      flex: 1; padding: 10px 14px;
-      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-      border-radius: 8px; color: var(--text); font-size: 14px; font-family: inherit; outline: none;
+    .asset-item:last-child { border-bottom: none; }
+    .asset-item:hover { background: rgba(255,255,255,0.02); }
+    .asset-icon {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0; margin-right: 14px;
     }
-    .lockbox-input:focus { border-color: var(--accent); }
+    .asset-info { flex: 1; }
+    .asset-name { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+    .asset-sub { font-size: 12px; color: var(--text-muted); }
+    .asset-right { text-align: right; }
+    .asset-amount { font-size: 15px; font-weight: 600; }
+    .asset-pct { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* ── Main grid (transactions + categories) ── */
+    .main-grid {
+      display: grid; grid-template-columns: 1.6fr 1fr;
+      gap: 16px; margin-bottom: 16px;
+    }
+
+    /* ── Cards ── */
+    .card { background: var(--bg-card); border-radius: 16px; padding: 20px; }
+    .card-title {
+      font-size: 15px; font-weight: 700; margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-title-sub { font-size: 12px; color: var(--text-muted); font-weight: 400; }
+
+    /* ── Transactions ── */
+    .tx-scroll { max-height: 480px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent; }
+    .tx-scroll::-webkit-scrollbar { width: 4px; }
+    .tx-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+    .tx-list { list-style: none; }
+    .tx-item {
+      display: flex; align-items: center;
+      padding: 11px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .tx-item:last-child { border-bottom: none; }
+    .tx-icon {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--bg-card-2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0; margin-right: 12px;
+    }
+    .tx-info { flex: 1; }
+    .tx-merchant { font-size: 14px; font-weight: 500; }
+    .tx-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .tx-amount { font-size: 14px; font-weight: 600; white-space: nowrap; }
+    .tx-amount.negative { color: var(--text); }
+    .tx-amount.positive { color: var(--green); }
+    .empty-state { text-align: center; padding: 32px 16px; color: var(--text-muted); font-size: 13px; }
+
+    /* ── Category bars ── */
+    .cat-bar-group { margin-bottom: 14px; }
+    .cat-bar-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; color: var(--text-muted); }
+    .cat-bar-label span:first-child { color: var(--text); font-weight: 500; }
+    .cat-bar-track { height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+    .cat-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+
+    /* ── Lockbox ── */
+    .lockbox-card { background: var(--bg-card); border-radius: 16px; padding: 20px; }
+    .lockbox-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .lockbox-title { font-size: 15px; font-weight: 700; }
+    .lockbox-amounts { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+    .lockbox-current { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: var(--green); }
+    .lockbox-goal { font-size: 13px; color: var(--text-muted); }
+    .progress-track { height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: 3px; transition: width 0.5s ease; }
+    .progress-label { font-size: 11px; color: var(--text-muted); text-align: right; margin-bottom: 14px; }
+    .lockbox-actions { display: flex; gap: 10px; }
+    .lockbox-input {
+      flex: 1; padding: 10px 16px;
+      background: var(--bg-card-2); border: none;
+      border-radius: 100px; color: var(--text); font-size: 14px; font-family: inherit; outline: none;
+    }
+    .lockbox-input:focus { background: rgba(255,255,255,0.1); }
+    .lockbox-input::placeholder { color: var(--text-muted); }
 
     /* ── Buttons ── */
     .btn-primary {
       display: inline-flex; align-items: center; gap: 8px;
-      background: var(--accent); color: #fff;
-      font-size: 14px; font-weight: 600;
-      padding: 10px 20px; border-radius: 8px;
+      background: var(--text); color: #000;
+      font-size: 13px; font-weight: 700;
+      padding: 10px 18px; border-radius: 100px;
       border: none; cursor: pointer; font-family: inherit;
       transition: opacity 0.2s, transform 0.15s;
-      text-decoration: none;
+      white-space: nowrap;
     }
     .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
     .btn-primary:active { transform: translateY(0); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .btn-sm { padding: 8px 16px; font-size: 13px; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
     .btn-outline {
       display: inline-flex; align-items: center; gap: 6px;
-      background: none; color: var(--accent);
-      font-size: 13px; font-weight: 600;
-      padding: 8px 16px; border-radius: 8px;
-      border: 1px solid var(--accent);
-      cursor: pointer; font-family: inherit; transition: background 0.2s;
+      background: var(--bg-card-2); color: var(--text);
+      font-size: 12px; font-weight: 600;
+      padding: 7px 14px; border-radius: 100px;
+      border: none; cursor: pointer; font-family: inherit;
+      transition: background 0.2s;
     }
-    .btn-outline:hover { background: rgba(26,86,219,0.1); }
-
-    /* ── Connect banner ── */
-    .connect-banner {
-      background: linear-gradient(135deg, rgba(26,86,219,0.15), rgba(0,212,255,0.08));
-      border: 1px solid rgba(26,86,219,0.3);
-      border-radius: 14px; padding: 24px;
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 24px;
-    }
-    .connect-banner-text h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
-    .connect-banner-text p { font-size: 13px; color: var(--text-muted); }
-
-    /* ── Show more ── */
+    .btn-outline:hover { background: rgba(255,255,255,0.15); }
     .btn-show-more {
-      display: block; width: 100%; margin-top: 12px;
-      padding: 10px; text-align: center;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 8px; color: var(--accent);
-      font-size: 13px; font-weight: 600;
-      cursor: pointer; font-family: inherit;
-      transition: background 0.2s, border-color 0.2s;
+      display: block; width: 100%; padding: 10px;
+      text-align: center; background: none;
+      border: none; border-radius: 8px;
+      color: var(--text-muted); font-size: 12px; font-weight: 600;
+      cursor: pointer; font-family: inherit; margin-top: 4px;
+      transition: color 0.2s;
     }
-    .btn-show-more:hover { background: rgba(26,86,219,0.1); border-color: var(--accent); }
-
-    /* ── Spinner ── */
-    .spinner {
-      display: inline-block; width: 18px; height: 18px;
-      border: 2px solid rgba(255,255,255,0.2);
-      border-top-color: var(--accent); border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-show-more:hover { color: var(--text); }
 
     /* ── Skeleton ── */
     .skeleton {
       background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-      border-radius: 6px;
+      background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px;
     }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-    .skeleton-value { height: 32px; width: 140px; margin-bottom: 4px; }
-    .skeleton-sub { height: 14px; width: 100px; }
-    .skeleton-tx { height: 48px; width: 100%; margin-bottom: 12px; border-radius: 8px; }
+    .skeleton-val { height: 34px; width: 120px; border-radius: 6px; display: inline-block; }
+    .skeleton-tx { height: 50px; width: 100%; margin-bottom: 8px; border-radius: 12px; }
+
+    /* ── Spinner ── */
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.15); border-top-color: var(--text); border-radius: 50%; animation: spin 0.6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ── Toast ── */
-    .toast-container {
-      position: fixed; top: 24px; right: 24px;
-      z-index: 1000; display: flex; flex-direction: column; gap: 8px;
-    }
-    .toast {
-      padding: 14px 20px; border-radius: 10px;
-      font-size: 13px; font-weight: 500;
-      backdrop-filter: blur(12px);
-      animation: toastIn 0.35s ease both;
-      max-width: 360px;
-    }
-    .toast.error { background: rgba(255,85,85,0.15); border: 1px solid rgba(255,85,85,0.3); color: #FF5555; }
-    .toast.success { background: rgba(40,200,64,0.15); border: 1px solid rgba(40,200,64,0.3); color: #28C840; }
-    .toast.info { background: rgba(26,86,219,0.15); border: 1px solid rgba(26,86,219,0.3); color: var(--cyan); }
+    .toast-container { position: fixed; top: 24px; right: 24px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; }
+    .toast { padding: 13px 18px; border-radius: 12px; font-size: 13px; font-weight: 500; backdrop-filter: blur(20px); animation: toastIn 0.35s ease both; max-width: 320px; }
+    .toast.error { background: rgba(255,67,58,0.15); border: 1px solid rgba(255,67,58,0.25); color: #FF453A; }
+    .toast.success { background: rgba(48,209,88,0.12); border: 1px solid rgba(48,209,88,0.25); color: #30D158; }
+    .toast.info { background: rgba(108,92,231,0.15); border: 1px solid rgba(108,92,231,0.25); color: #a78bfa; }
     .toast.fade-out { animation: toastOut 0.3s ease both; }
-    @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
     @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateX(40px); } }
 
-    /* ── Mobile: bottom nav ── */
+    /* ── Mobile ── */
     @media (max-width: 768px) {
       .sidebar {
         top: auto; bottom: 0; left: 0; right: 0;
@@ -272,22 +301,17 @@
         padding: 0 8px;
       }
       .sidebar-logo { display: none; }
-      .sidebar-nav {
-        flex-direction: row; gap: 0; padding: 0;
-        justify-content: space-around; width: 100%;
-      }
-      .nav-item {
-        flex-direction: column; gap: 4px;
-        padding: 8px 6px; border-radius: 8px;
-        font-size: 11px; align-items: center; justify-content: center;
-      }
-      .nav-item .nav-icon { font-size: 20px; }
-      .nav-item .nav-label { font-size: 10px; }
+      .sidebar-nav { flex-direction: row; padding: 0; justify-content: space-around; gap: 0; }
+      .nav-item { flex-direction: column; gap: 3px; padding: 8px 10px; border-radius: 10px; }
+      .nav-item::after { content: attr(data-label); font-size: 10px; font-weight: 500; color: inherit; }
+      .nav-tooltip { display: none; }
       .sidebar-bottom { display: none; }
-      .content { margin-left: 0; padding: 24px 16px 88px; }
-      .grid { grid-template-columns: 1fr; }
-      .two-col { grid-template-columns: 1fr; }
-      .connect-banner { flex-direction: column; gap: 16px; text-align: center; }
+      .content { margin-left: 0; padding: 0 16px 84px; }
+      .main-grid { grid-template-columns: 1fr; }
+      .hero { padding: 28px 0 20px; }
+      .ring-wrap { width: 220px; height: 220px; }
+      .ring-value { font-size: 28px; }
+      .connect-banner { flex-direction: column; gap: 12px; text-align: center; }
     }
   </style>
 </head>
@@ -298,83 +322,120 @@
   <aside class="sidebar">
     <a href="/dashboard.html" class="sidebar-logo">
       <div class="logo-icon">H</div>
-      <span class="logo-text">Holdwise</span>
     </a>
     <nav class="sidebar-nav">
-      <a href="/dashboard.html" class="nav-item active">
-        <span class="nav-icon">&#127968;</span>
-        <span class="nav-label">Dashboard</span>
+      <a href="/dashboard.html" class="nav-item active" data-label="Home">
+        <span class="nav-icon">⌂</span>
+        <span class="nav-tooltip">Dashboard</span>
       </a>
-      <a href="/transactions.html" class="nav-item">
-        <span class="nav-icon">&#128179;</span>
-        <span class="nav-label">Transactions</span>
+      <a href="/transactions.html" class="nav-item" data-label="Txns">
+        <span class="nav-icon">↕</span>
+        <span class="nav-tooltip">Transactions</span>
       </a>
-      <a href="/savings.html" class="nav-item">
-        <span class="nav-icon">&#128274;</span>
-        <span class="nav-label">Savings</span>
+      <a href="/savings.html" class="nav-item" data-label="Save">
+        <span class="nav-icon">🔐</span>
+        <span class="nav-tooltip">Savings</span>
       </a>
-      <a href="/settings.html" class="nav-item">
-        <span class="nav-icon">&#9881;&#65039;</span>
-        <span class="nav-label">Settings</span>
+      <a href="/settings.html" class="nav-item" data-label="More">
+        <span class="nav-icon">⚙</span>
+        <span class="nav-tooltip">Settings</span>
       </a>
     </nav>
     <div class="sidebar-bottom">
       <button class="nav-item logout" onclick="handleLogout()">
-        <span class="nav-icon">&#128682;</span>
-        <span class="nav-label">Log Out</span>
+        <span class="nav-icon">⏻</span>
+        <span class="nav-tooltip">Log Out</span>
       </button>
     </div>
   </aside>
 
-  <!-- Main Content -->
+  <!-- Content -->
   <div class="content">
-    <h1 class="page-title">Dashboard</h1>
 
-    <!-- Connect Bank Banner -->
+    <!-- Hero ring -->
+    <div class="hero">
+      <div class="ring-wrap">
+        <svg class="ring-svg" viewBox="0 0 260 260">
+          <defs>
+            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#6C5CE7"/>
+              <stop offset="50%" stop-color="#00B4D8"/>
+              <stop offset="100%" stop-color="#00D4FF"/>
+            </linearGradient>
+          </defs>
+          <circle class="ring-bg" cx="130" cy="130" r="105"/>
+          <circle class="ring-fill" cx="130" cy="130" r="105" stroke="url(#ringGrad)" id="ring-progress"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-label">Total assets</div>
+          <div class="ring-value" id="total-balance"><span class="skeleton skeleton-val"></span></div>
+          <div class="ring-sub" id="accounts-count">Loading...</div>
+        </div>
+      </div>
+
+      <!-- Stats pills -->
+      <div class="stats-row">
+        <div class="stat-pill">
+          <div class="stat-pill-label">Monthly spend</div>
+          <div class="stat-pill-value" id="monthly-spending"><span class="skeleton" style="height:22px;width:80px;display:inline-block;border-radius:5px;"></span></div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-pill-label">Transactions</div>
+          <div class="stat-pill-value" id="tx-count"><span class="skeleton" style="height:22px;width:40px;display:inline-block;border-radius:5px;"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connect banner -->
     <div class="connect-banner" id="connect-banner">
       <div class="connect-banner-text">
-        <h3 id="connect-title">Connect your bank account</h3>
-        <p id="connect-desc">Link your bank to see balances, transactions, and spending insights.</p>
+        <h3 id="connect-title">Connect your bank</h3>
+        <p id="connect-desc">Link your bank to see balance, transactions, and insights.</p>
       </div>
       <button class="btn-primary" id="connect-btn" onclick="connectBank()">Connect Bank</button>
     </div>
 
-    <!-- Summary Cards -->
-    <div class="grid">
-      <div class="card card-balance">
-        <div class="card-label">Total Balance</div>
-        <div id="total-balance"><div class="skeleton skeleton-value"></div></div>
-        <div id="accounts-count"><div class="skeleton skeleton-sub"></div></div>
+    <!-- Asset list -->
+    <div class="asset-card">
+      <div class="asset-item">
+        <div class="asset-icon" style="background:#3A36DB;">💳</div>
+        <div class="asset-info">
+          <div class="asset-name">Cash</div>
+          <div class="asset-sub" id="asset-sub">—</div>
+        </div>
+        <div class="asset-right">
+          <div class="asset-amount" id="asset-balance">—</div>
+          <div class="asset-pct">100%</div>
+        </div>
       </div>
-      <div class="card">
-        <div class="card-label">Monthly Spending</div>
-        <div id="monthly-spending"><div class="skeleton skeleton-value"></div></div>
-        <div class="card-sub">Last 30 days</div>
-      </div>
-      <div class="card">
-        <div class="card-label">Transactions</div>
-        <div id="tx-count"><div class="skeleton skeleton-value"></div></div>
-        <div class="card-sub">Last 30 days</div>
+      <div class="asset-item">
+        <div class="asset-icon" style="background:#FF9F0A;">🎯</div>
+        <div class="asset-info">
+          <div class="asset-name">Savings Lockbox</div>
+          <div class="asset-sub">Goal tracker</div>
+        </div>
+        <div class="asset-right">
+          <div class="asset-amount" id="asset-savings">$0.00</div>
+        </div>
       </div>
     </div>
 
     <!-- Transactions + Categories -->
-    <div class="two-col">
+    <div class="main-grid">
       <div class="card">
         <div class="card-title">
-          <span>Recent Transactions</span>
-          <span id="tx-showing" style="font-size:12px;color:var(--text-muted);font-weight:400;"></span>
+          Transactions
+          <span class="card-title-sub" id="tx-showing"></span>
         </div>
         <div id="tx-list">
           <div class="skeleton skeleton-tx"></div>
           <div class="skeleton skeleton-tx"></div>
           <div class="skeleton skeleton-tx"></div>
           <div class="skeleton skeleton-tx"></div>
-          <div class="skeleton skeleton-tx"></div>
         </div>
       </div>
       <div class="card">
-        <div class="card-title">Spending by Category</div>
+        <div class="card-title">By Category</div>
         <div id="cat-chart">
           <div class="skeleton skeleton-tx"></div>
           <div class="skeleton skeleton-tx"></div>
@@ -384,26 +445,25 @@
     </div>
 
     <!-- Savings Lockbox -->
-    <div class="lockbox-section">
-      <div class="lockbox-card">
-        <div class="lockbox-header">
-          <div class="card-title" style="margin-bottom:0;">Savings Lockbox</div>
-          <button class="btn-outline btn-sm" onclick="editGoal()">Edit Goal</button>
-        </div>
-        <div class="lockbox-amounts">
-          <span class="lockbox-current" id="lockbox-current">$0.00</span>
-          <span class="lockbox-goal" id="lockbox-goal">of $5,000.00 goal</span>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill" id="lockbox-progress" style="width: 0%"></div>
-        </div>
-        <div class="progress-label" id="lockbox-percent">0% reached</div>
-        <div class="lockbox-actions">
-          <input type="number" class="lockbox-input" id="lockbox-amount" placeholder="Amount to save" min="0" step="0.01" />
-          <button class="btn-primary btn-sm" onclick="addToLockbox()">Add Savings</button>
-        </div>
+    <div class="lockbox-card">
+      <div class="lockbox-header">
+        <div class="lockbox-title">Savings Lockbox</div>
+        <button class="btn-outline" onclick="editGoal()">Edit Goal</button>
+      </div>
+      <div class="lockbox-amounts">
+        <span class="lockbox-current" id="lockbox-current">$0.00</span>
+        <span class="lockbox-goal" id="lockbox-goal">of $5,000.00 goal</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="lockbox-progress" style="width:0%"></div>
+      </div>
+      <div class="progress-label" id="lockbox-percent">0% reached</div>
+      <div class="lockbox-actions">
+        <input type="number" class="lockbox-input" id="lockbox-amount" placeholder="Amount to save" min="0" step="0.01" />
+        <button class="btn-primary" onclick="addToLockbox()">Add</button>
       </div>
     </div>
+
   </div>
 
   <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>

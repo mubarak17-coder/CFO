@@ -6,31 +6,27 @@
   <title>Transactions — Holdwise</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --bg: #0A0F1E;
-      --bg-card: #111827;
-      --bg-sidebar: #0F1F3D;
-      --border: rgba(255,255,255,0.08);
-      --text: #FFFFFF;
-      --text-muted: rgba(255,255,255,0.5);
-      --accent: #1A56DB;
-      --cyan: #00D4FF;
-      --green: #28C840;
-      --red: #FF5555;
-      --yellow: #FFB800;
-      --sidebar-w: 240px;
+      --bg: #000;
+      --bg-card: #1C1C1E;
+      --bg-card-2: #2C2C2E;
+      --border: rgba(255,255,255,0.07);
+      --text: #fff;
+      --text-muted: rgba(255,255,255,0.45);
+      --accent: #6C5CE7;
+      --accent-2: #00D4FF;
+      --green: #30D158;
+      --red: #FF453A;
+      --sidebar-w: 72px;
     }
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      background: var(--bg); color: var(--text);
       -webkit-font-smoothing: antialiased;
-      min-height: 100vh;
-      opacity: 0;
-      transition: opacity 0.4s ease;
+      min-height: 100vh; opacity: 0; transition: opacity 0.4s ease;
     }
     body.loaded { opacity: 1; }
     body.fade-out { opacity: 0; transition: opacity 0.25s ease; }
@@ -38,221 +34,210 @@
     /* ── Sidebar ── */
     .sidebar {
       position: fixed; top: 0; left: 0; bottom: 0;
-      width: var(--sidebar-w);
-      background: var(--bg-sidebar);
+      width: var(--sidebar-w); background: #111;
       border-right: 1px solid var(--border);
-      display: flex; flex-direction: column;
-      z-index: 100;
-      transition: transform 0.3s ease;
+      display: flex; flex-direction: column; align-items: center; z-index: 100;
     }
-    .sidebar-logo {
-      display: flex; align-items: center; gap: 10px;
-      padding: 24px 20px 32px;
-      text-decoration: none;
-    }
-    .sidebar-logo .logo-icon {
+    .sidebar-logo { padding: 24px 0 28px; display: flex; justify-content: center; text-decoration: none; }
+    .logo-icon {
       width: 36px; height: 36px;
-      background: linear-gradient(135deg, var(--cyan), var(--accent));
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px; font-weight: 900; color: #fff;
-      flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 900; color: #fff;
     }
-    .sidebar-logo .logo-text { font-size: 18px; font-weight: 700; color: var(--text); }
-    .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 0 12px; }
+    .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 0 8px; }
     .nav-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 14px; border-radius: 10px;
-      color: var(--text-muted); font-size: 14px; font-weight: 500;
-      text-decoration: none; cursor: pointer;
-      border: none; background: none; font-family: inherit;
-      width: 100%; text-align: left;
-      transition: color 0.2s, background 0.2s;
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; padding: 13px 0; border-radius: 12px;
+      color: var(--text-muted); text-decoration: none;
+      border: none; background: none; cursor: pointer; font-family: inherit;
+      transition: color 0.2s, background 0.2s; position: relative;
     }
-    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-    .nav-item.active { color: #fff; background: var(--accent); }
-    .nav-item .nav-icon { font-size: 18px; width: 24px; text-align: center; line-height: 1; }
-    .nav-item .nav-label { white-space: nowrap; }
-    .sidebar-bottom { padding: 16px 12px 24px; border-top: 1px solid var(--border); margin-top: auto; }
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+    .nav-item.active { color: var(--text); background: rgba(255,255,255,0.1); }
+    .nav-icon { font-size: 20px; line-height: 1; }
+    .nav-tooltip {
+      position: absolute; left: calc(100% + 10px);
+      background: var(--bg-card); color: var(--text); font-size: 12px; font-weight: 600;
+      padding: 5px 10px; border-radius: 8px; white-space: nowrap;
+      pointer-events: none; opacity: 0; transition: opacity 0.15s;
+      border: 1px solid var(--border); z-index: 200;
+    }
+    .nav-item:hover .nav-tooltip { opacity: 1; }
+    .sidebar-bottom { padding: 16px 8px 24px; width: 100%; }
     .nav-item.logout { color: var(--red); }
-    .nav-item.logout:hover { background: rgba(255,85,85,0.1); }
+    .nav-item.logout:hover { background: rgba(255,67,58,0.1); color: var(--red); }
 
     /* ── Content ── */
-    .content {
-      margin-left: var(--sidebar-w);
-      padding: 32px 32px 40px;
-      max-width: calc(1100px + var(--sidebar-w));
-      min-height: 100vh;
-    }
-    .page-title { font-size: 24px; font-weight: 700; margin-bottom: 24px; }
+    .content { margin-left: var(--sidebar-w); padding: 0 32px 48px; max-width: calc(900px + var(--sidebar-w)); min-height: 100vh; }
 
-    /* ── Search & Filter Bar ── */
+    /* ── Page header ── */
+    .page-header { padding: 36px 0 20px; display: flex; align-items: center; justify-content: space-between; }
+    .page-title { font-size: 26px; font-weight: 800; letter-spacing: -0.8px; }
+    .page-sub { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+    /* ── Toolbar ── */
     .toolbar {
-      display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
+      display: flex; gap: 10px; align-items: center;
+      margin-bottom: 16px; flex-wrap: wrap;
     }
+    .search-wrap { position: relative; flex: 1; min-width: 200px; }
+    .search-wrap svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
     .search-input {
-      flex: 1; min-width: 200px;
-      padding: 10px 14px 10px 38px;
+      width: 100%; padding: 11px 16px 11px 40px;
       background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 10px; color: var(--text); font-size: 14px;
+      border-radius: 100px; color: var(--text); font-size: 14px;
       font-family: inherit; outline: none;
-      transition: border-color 0.2s;
     }
-    .search-input:focus { border-color: var(--accent); }
-    .search-wrapper {
-      position: relative; flex: 1; min-width: 200px;
-    }
-    .search-wrapper::before {
-      content: '&#128269;';
-      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-      font-size: 15px; pointer-events: none;
-    }
+    .search-input::placeholder { color: var(--text-muted); }
+    .search-input:focus { border-color: rgba(108,92,231,0.5); }
     .filter-select {
-      padding: 10px 14px;
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 10px; color: var(--text); font-size: 14px;
-      font-family: inherit; outline: none; cursor: pointer;
-      appearance: none; min-width: 160px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.5)' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      padding-right: 32px;
+      padding: 11px 16px; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: 100px;
+      color: var(--text); font-size: 13px; font-family: inherit;
+      outline: none; cursor: pointer;
     }
-    .filter-select:focus { border-color: var(--accent); }
+    .filter-select option { background: var(--bg-card); }
 
-    /* ── Transaction Cards ── */
-    .card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 14px; padding: 24px;
-      transition: border-color 0.2s;
+    /* ── Summary pills ── */
+    .summary-row { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .summary-pill {
+      background: var(--bg-card); border-radius: 12px;
+      padding: 12px 18px; flex: 1; min-width: 120px;
     }
+    .summary-label { font-size: 11px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+    .summary-value { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
+    .summary-value.red { color: var(--red); }
+    .summary-value.green { color: var(--green); }
+
+    /* ── Card ── */
+    .card { background: var(--bg-card); border-radius: 16px; padding: 20px; }
+    .card-title { font-size: 15px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+    .card-title-sub { font-size: 12px; color: var(--text-muted); font-weight: 400; }
+
+    /* ── Transactions ── */
+    .tx-scroll { max-height: 600px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent; }
+    .tx-scroll::-webkit-scrollbar { width: 4px; }
+    .tx-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
     .tx-item {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 0; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
     }
     .tx-item:last-child { border-bottom: none; }
-    .tx-left { display: flex; flex-direction: column; gap: 2px; }
+    .tx-icon {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--bg-card-2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px; flex-shrink: 0; margin-right: 14px;
+    }
+    .tx-info { flex: 1; }
     .tx-merchant { font-size: 14px; font-weight: 500; }
-    .tx-meta { font-size: 12px; color: var(--text-muted); }
+    .tx-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
     .tx-amount { font-size: 14px; font-weight: 600; white-space: nowrap; }
-    .tx-amount.negative { color: var(--red); }
+    .tx-amount.negative { color: var(--text); }
     .tx-amount.positive { color: var(--green); }
-    .tx-category-badge {
-      display: inline-block;
-      padding: 3px 8px; border-radius: 6px;
-      font-size: 11px; font-weight: 600;
-      background: rgba(26,86,219,0.15); color: var(--cyan);
-      margin-left: 8px;
-    }
-    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 14px; }
-    .tx-count-label {
-      font-size: 13px; color: var(--text-muted); margin-bottom: 16px;
-    }
+    .empty-state { text-align: center; padding: 48px 16px; color: var(--text-muted); font-size: 13px; }
 
-    /* ── Skeleton ── */
-    .skeleton {
-      background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
-      background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 6px;
+    .btn-show-more {
+      width: 100%; margin-top: 12px; padding: 11px;
+      background: rgba(255,255,255,0.06); border: none; border-radius: 100px;
+      color: var(--text); font-size: 13px; font-weight: 600;
+      font-family: inherit; cursor: pointer; transition: background 0.2s;
     }
-    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-    .skeleton-tx { height: 52px; width: 100%; margin-bottom: 12px; border-radius: 8px; }
+    .btn-show-more:hover { background: rgba(255,255,255,0.1); }
 
     /* ── Toast ── */
     .toast-container { position: fixed; top: 24px; right: 24px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; }
-    .toast { padding: 14px 20px; border-radius: 10px; font-size: 13px; font-weight: 500; backdrop-filter: blur(12px); animation: toastIn 0.35s ease both; max-width: 360px; }
-    .toast.error { background: rgba(255,85,85,0.15); border: 1px solid rgba(255,85,85,0.3); color: #FF5555; }
-    .toast.success { background: rgba(40,200,64,0.15); border: 1px solid rgba(40,200,64,0.3); color: #28C840; }
-    .toast.info { background: rgba(26,86,219,0.15); border: 1px solid rgba(26,86,219,0.3); color: var(--cyan); }
+    .toast { padding: 13px 18px; border-radius: 12px; font-size: 13px; font-weight: 500; backdrop-filter: blur(20px); animation: toastIn 0.35s ease both; max-width: 320px; }
+    .toast.error { background: rgba(255,67,58,0.15); border: 1px solid rgba(255,67,58,0.25); color: #FF453A; }
+    .toast.success { background: rgba(48,209,88,0.12); border: 1px solid rgba(48,209,88,0.25); color: #30D158; }
     .toast.fade-out { animation: toastOut 0.3s ease both; }
-    @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
     @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateX(40px); } }
 
-    /* ── Spinner ── */
-    .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── Mobile ── */
-    @media (max-width: 768px) {
-      .sidebar {
-        top: auto; bottom: 0; left: 0; right: 0;
-        width: 100%; height: 64px;
-        flex-direction: row; align-items: center;
-        border-right: none; border-top: 1px solid var(--border);
-        padding: 0 8px;
-      }
-      .sidebar-logo { display: none; }
-      .sidebar-nav { flex-direction: row; gap: 0; padding: 0; justify-content: space-around; width: 100%; }
-      .nav-item { flex-direction: column; gap: 4px; padding: 8px 6px; border-radius: 8px; font-size: 11px; align-items: center; justify-content: center; }
-      .nav-item .nav-icon { font-size: 20px; }
-      .nav-item .nav-label { font-size: 10px; }
-      .sidebar-bottom { display: none; }
-      .content { margin-left: 0; padding: 24px 16px 88px; }
-      .toolbar { flex-direction: column; }
+    @media (max-width: 600px) {
+      .content { padding: 0 16px 48px; }
+      .toolbar { flex-direction: column; align-items: stretch; }
     }
   </style>
 </head>
 <body>
   <div class="toast-container" id="toast-container"></div>
 
-  <!-- Sidebar -->
   <aside class="sidebar">
-    <a href="/dashboard.html" class="sidebar-logo">
-      <div class="logo-icon">H</div>
-      <span class="logo-text">Holdwise</span>
-    </a>
+    <a href="/dashboard.html" class="sidebar-logo"><div class="logo-icon">H</div></a>
     <nav class="sidebar-nav">
-      <a href="/dashboard.html" class="nav-item">
-        <span class="nav-icon">&#127968;</span>
-        <span class="nav-label">Dashboard</span>
+      <a href="/dashboard.html" class="nav-item" data-label="Home">
+        <span class="nav-icon">⌂</span><span class="nav-tooltip">Dashboard</span>
       </a>
-      <a href="/transactions.html" class="nav-item active">
-        <span class="nav-icon">&#128179;</span>
-        <span class="nav-label">Transactions</span>
+      <a href="/transactions.html" class="nav-item active" data-label="Txns">
+        <span class="nav-icon">↕</span><span class="nav-tooltip">Transactions</span>
       </a>
-      <a href="/savings.html" class="nav-item">
-        <span class="nav-icon">&#128274;</span>
-        <span class="nav-label">Savings</span>
+      <a href="/savings.html" class="nav-item" data-label="Save">
+        <span class="nav-icon">🔐</span><span class="nav-tooltip">Savings</span>
       </a>
-      <a href="/settings.html" class="nav-item">
-        <span class="nav-icon">&#9881;&#65039;</span>
-        <span class="nav-label">Settings</span>
+      <a href="/settings.html" class="nav-item" data-label="More">
+        <span class="nav-icon">⚙</span><span class="nav-tooltip">Settings</span>
       </a>
     </nav>
     <div class="sidebar-bottom">
       <button class="nav-item logout" onclick="handleLogout()">
-        <span class="nav-icon">&#128682;</span>
-        <span class="nav-label">Log Out</span>
+        <span class="nav-icon">⏻</span><span class="nav-tooltip">Log Out</span>
       </button>
     </div>
   </aside>
 
-  <!-- Main Content -->
-  <div class="content">
-    <h1 class="page-title">Transactions</h1>
-
-    <!-- Search & Filter -->
-    <div class="toolbar">
-      <div class="search-wrapper">
-        <input type="text" class="search-input" id="tx-search" placeholder="Search transactions..." oninput="filterTransactions()" />
+  <main class="content">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Transactions</div>
+        <div class="page-sub">All your spending in one place</div>
       </div>
-      <select class="filter-select" id="tx-category-filter" onchange="filterTransactions()">
-        <option value="">All Categories</option>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary-row">
+      <div class="summary-pill">
+        <div class="summary-label">Total Transactions</div>
+        <div class="summary-value" id="total-count">—</div>
+      </div>
+      <div class="summary-pill">
+        <div class="summary-label">Total Spent</div>
+        <div class="summary-value red" id="total-spent">—</div>
+      </div>
+      <div class="summary-pill">
+        <div class="summary-label">Total Income</div>
+        <div class="summary-value green" id="total-income">—</div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input class="search-input" id="search-input" type="text" placeholder="Search transactions..." oninput="filterTransactions()" />
+      </div>
+      <select class="filter-select" id="filter-type" onchange="filterTransactions()">
+        <option value="all">All types</option>
+        <option value="spent">Spent</option>
+        <option value="income">Income</option>
+      </select>
+      <select class="filter-select" id="filter-cat" onchange="filterTransactions()">
+        <option value="all">All categories</option>
       </select>
     </div>
 
-    <!-- Transaction List -->
+    <!-- Transactions card -->
     <div class="card">
-      <div class="tx-count-label" id="tx-count-label">Loading transactions...</div>
+      <div class="card-title">
+        <span>All Transactions</span>
+        <span class="card-title-sub" id="tx-showing"></span>
+      </div>
       <div id="tx-list">
-        <div class="skeleton skeleton-tx"></div>
-        <div class="skeleton skeleton-tx"></div>
-        <div class="skeleton skeleton-tx"></div>
-        <div class="skeleton skeleton-tx"></div>
-        <div class="skeleton skeleton-tx"></div>
-        <div class="skeleton skeleton-tx"></div>
+        <div class="empty-state">Connect a bank account to see transactions</div>
       </div>
     </div>
-  </div>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -260,29 +245,91 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzbWlndWhuZGdqbXlnYnhoYWdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MDY2NTYsImV4cCI6MjA5MDM4MjY1Nn0.xhPxYmIxBdJu856e63WQna_fQTC1FRqILZcuctemIpo';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    (async function() {
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) { window.location.href = '/login.html'; return; }
-      document.body.classList.add('loaded');
-    })();
+    let allTransactions = [];
+    let filteredTransactions = [];
+    let txPage = 0;
+    const TX_PER_PAGE = 20;
 
-    function navigateTo(url) {
-      document.body.classList.add('fade-out');
-      setTimeout(() => { window.location.href = url; }, 250);
+    function formatCurrency(v) {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(v);
+    }
+    function formatDate(d) {
+      return new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+    function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    function getTxIcon(name, cat) {
+      const n = (name || '').toLowerCase();
+      if (n.includes('uber') || n.includes('lyft')) return '🚗';
+      if (n.includes('mcdonald') || n.includes('burger') || n.includes('kfc')) return '🍔';
+      if (n.includes('starbucks') || n.includes('coffee')) return '☕';
+      if (n.includes('amazon') || n.includes('shop')) return '🛍️';
+      if (n.includes('netflix') || n.includes('spotify') || n.includes('apple')) return '📱';
+      if (n.includes('airline') || n.includes('flight') || n.includes('delta')) return '✈️';
+      if (n.includes('hotel') || n.includes('airbnb')) return '🏨';
+      if (n.includes('gym') || n.includes('fitness')) return '💪';
+      if (n.includes('pharmacy') || n.includes('cvs')) return '💊';
+      if (n.includes('pizza') || n.includes('restaurant') || n.includes('sushi')) return '🍽️';
+      const c = ((cat && cat[0]) || '').toLowerCase();
+      if (c.includes('food') || c.includes('dining')) return '🍽️';
+      if (c.includes('travel') || c.includes('transport')) return '✈️';
+      if (c.includes('shopping')) return '🛍️';
+      if (c.includes('health')) return '💊';
+      if (c.includes('entertainment')) return '🎬';
+      if (c.includes('bill')) return '📄';
+      return '💳';
     }
 
-    // ── Helpers ──
-    function escapeHtml(str) {
-      const div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
+    function renderTxItem(tx) {
+      const isNeg = tx.amount > 0;
+      const merchant = escapeHtml(tx.merchant_name || tx.name || 'Unknown');
+      const categories = escapeHtml((tx.category || []).join(', ') || 'Uncategorized');
+      const icon = getTxIcon(tx.merchant_name || tx.name, tx.category);
+      return `
+        <div class="tx-item">
+          <div class="tx-icon">${icon}</div>
+          <div class="tx-info">
+            <div class="tx-merchant">${merchant}</div>
+            <div class="tx-meta">${escapeHtml(formatDate(tx.date))} · ${categories}</div>
+          </div>
+          <span class="tx-amount ${isNeg ? 'negative' : 'positive'}">${isNeg ? '-' : '+'}${formatCurrency(Math.abs(tx.amount))}</span>
+        </div>`;
     }
-    function formatCurrency(amount) {
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+
+    function renderPage() {
+      const container = document.getElementById('tx-list');
+      const showingEl = document.getElementById('tx-showing');
+      if (filteredTransactions.length === 0) {
+        container.innerHTML = '<div class="empty-state">No transactions match your filters</div>';
+        if (showingEl) showingEl.textContent = '';
+        return;
+      }
+      const visible = filteredTransactions.slice(0, (txPage + 1) * TX_PER_PAGE);
+      const hasMore = filteredTransactions.length > visible.length;
+      if (showingEl) showingEl.textContent = `Showing ${visible.length} of ${filteredTransactions.length}`;
+      container.innerHTML = `
+        <div class="tx-scroll">
+          <div id="tx-items">${visible.map(renderTxItem).join('')}</div>
+        </div>
+        ${hasMore ? '<button class="btn-show-more" onclick="showMoreTx()">Show more</button>' : ''}`;
     }
-    function formatDate(dateStr) {
-      const d = new Date(dateStr + 'T00:00:00');
-      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+    function showMoreTx() { txPage++; renderPage(); }
+
+    function filterTransactions() {
+      const q = document.getElementById('search-input').value.toLowerCase();
+      const type = document.getElementById('filter-type').value;
+      const cat = document.getElementById('filter-cat').value;
+      filteredTransactions = allTransactions.filter(tx => {
+        const name = (tx.merchant_name || tx.name || '').toLowerCase();
+        if (q && !name.includes(q)) return false;
+        if (type === 'spent' && tx.amount <= 0) return false;
+        if (type === 'income' && tx.amount > 0) return false;
+        if (cat !== 'all' && !(tx.category || []).includes(cat)) return false;
+        return true;
+      });
+      txPage = 0;
+      renderPage();
     }
 
     async function getAuthHeaders() {
@@ -290,114 +337,61 @@
       if (!session) return {};
       return { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json' };
     }
-    async function authFetch(url, options = {}) {
-      const headers = await getAuthHeaders();
-      const res = await fetch(url, { ...options, headers: { ...headers, ...options.headers } });
-      if (res.status === 401) { await supabaseClient.auth.signOut(); window.location.href = '/login.html'; throw new Error('Session expired'); }
-      return res;
+
+    async function loadTransactions() {
+      try {
+        const headers = await getAuthHeaders();
+        const res = await fetch('/api/transactions', { headers });
+        if (res.status === 401) { navigateTo('/login.html'); return; }
+        const data = await res.json();
+        const txs = data.transactions || [];
+        allTransactions = txs;
+        filteredTransactions = txs;
+
+        // Summary
+        let spent = 0, income = 0;
+        txs.forEach(tx => { if (tx.amount > 0) spent += tx.amount; else income += Math.abs(tx.amount); });
+        document.getElementById('total-count').textContent = txs.length;
+        document.getElementById('total-spent').textContent = formatCurrency(spent);
+        document.getElementById('total-income').textContent = formatCurrency(income);
+
+        // Category filter options
+        const cats = [...new Set(txs.flatMap(tx => tx.category || []))].sort();
+        const sel = document.getElementById('filter-cat');
+        cats.forEach(c => {
+          const o = document.createElement('option');
+          o.value = c; o.textContent = c; sel.appendChild(o);
+        });
+
+        renderPage();
+      } catch {
+        showToast('Failed to load transactions.', 'error');
+      }
     }
 
-    function showToast(msg, type = 'info') {
-      const container = document.getElementById('toast-container');
-      if (!container) return;
-      const toast = document.createElement('div');
-      toast.className = `toast ${type}`;
-      toast.textContent = msg;
-      container.appendChild(toast);
-      setTimeout(() => { toast.classList.add('fade-out'); setTimeout(() => toast.remove(), 300); }, 4000);
+    function navigateTo(url) {
+      document.body.classList.add('fade-out');
+      setTimeout(() => window.location.href = url, 220);
+    }
+
+    function showToast(msg, type = 'error') {
+      const c = document.getElementById('toast-container');
+      const t = document.createElement('div');
+      t.className = `toast ${type}`; t.textContent = msg; c.appendChild(t);
+      setTimeout(() => { t.classList.add('fade-out'); setTimeout(() => t.remove(), 300); }, 4000);
     }
 
     async function handleLogout() {
       await supabaseClient.auth.signOut();
-      localStorage.removeItem('holdwise_lockbox');
-      localStorage.removeItem('holdwise_lockbox_goal');
       navigateTo('/login.html');
     }
 
-    // ── Transaction State ──
-    let allTransactions = [];
-    let filteredTransactions = [];
-
-    function getCategories(transactions) {
-      const cats = new Set();
-      transactions.forEach(tx => {
-        const cat = (tx.category && tx.category[0]) || 'Other';
-        cats.add(cat);
-      });
-      return [...cats].sort();
-    }
-
-    function renderTxItem(tx) {
-      const isNeg = tx.amount > 0;
-      const merchant = escapeHtml(tx.merchant_name || tx.name || 'Unknown');
-      const cat = escapeHtml((tx.category && tx.category[0]) || 'Uncategorized');
-      const categories = escapeHtml((tx.category || []).join(', ') || 'Uncategorized');
-      return `
-        <div class="tx-item">
-          <div class="tx-left">
-            <span class="tx-merchant">${merchant}<span class="tx-category-badge">${cat}</span></span>
-            <span class="tx-meta">${escapeHtml(formatDate(tx.date))} · ${categories}</span>
-          </div>
-          <span class="tx-amount ${isNeg ? 'negative' : 'positive'}">${isNeg ? '-' : '+'}${formatCurrency(Math.abs(tx.amount))}</span>
-        </div>
-      `;
-    }
-
-    function filterTransactions() {
-      const query = document.getElementById('tx-search').value.toLowerCase();
-      const catFilter = document.getElementById('tx-category-filter').value;
-
-      filteredTransactions = allTransactions.filter(tx => {
-        const merchant = (tx.merchant_name || tx.name || '').toLowerCase();
-        const cats = (tx.category || []).join(' ').toLowerCase();
-        const matchSearch = !query || merchant.includes(query) || cats.includes(query);
-        const matchCat = !catFilter || (tx.category && tx.category[0] === catFilter);
-        return matchSearch && matchCat;
-      });
-
-      renderList(filteredTransactions);
-    }
-
-    function renderList(transactions) {
-      const container = document.getElementById('tx-list');
-      const label = document.getElementById('tx-count-label');
-
-      if (transactions.length === 0) {
-        label.textContent = 'No transactions found';
-        container.innerHTML = '<div class="empty-state">No transactions match your search.</div>';
-        return;
-      }
-
-      label.textContent = `Showing ${transactions.length} transaction${transactions.length !== 1 ? 's' : ''}`;
-      container.innerHTML = transactions.map(renderTxItem).join('');
-    }
-
-    async function loadTransactions() {
-      try {
-        const res = await authFetch('/api/transactions');
-        const data = await res.json();
-        allTransactions = data.transactions || [];
-
-        // Populate category filter
-        const filterEl = document.getElementById('tx-category-filter');
-        const cats = getCategories(allTransactions);
-        cats.forEach(cat => {
-          const opt = document.createElement('option');
-          opt.value = cat;
-          opt.textContent = cat;
-          filterEl.appendChild(opt);
-        });
-
-        filteredTransactions = [...allTransactions];
-        renderList(filteredTransactions);
-      } catch (err) {
-        showToast('Failed to load transactions.', 'error');
-        document.getElementById('tx-count-label').textContent = 'Could not load transactions';
-        document.getElementById('tx-list').innerHTML = '<div class="empty-state">Connect a bank account in Dashboard to see transactions.</div>';
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', loadTransactions);
+    (async function() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) { navigateTo('/login.html'); return; }
+      document.body.classList.add('loaded');
+      loadTransactions();
+    })();
   </script>
 </body>
 </html>

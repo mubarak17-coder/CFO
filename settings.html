@@ -6,31 +6,27 @@
   <title>Settings — Holdwise</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --bg: #0A0F1E;
-      --bg-card: #111827;
-      --bg-sidebar: #0F1F3D;
-      --border: rgba(255,255,255,0.08);
-      --text: #FFFFFF;
-      --text-muted: rgba(255,255,255,0.5);
-      --accent: #1A56DB;
-      --cyan: #00D4FF;
-      --green: #28C840;
-      --red: #FF5555;
-      --yellow: #FFB800;
-      --sidebar-w: 240px;
+      --bg: #000;
+      --bg-card: #1C1C1E;
+      --bg-card-2: #2C2C2E;
+      --border: rgba(255,255,255,0.07);
+      --text: #fff;
+      --text-muted: rgba(255,255,255,0.45);
+      --accent: #6C5CE7;
+      --accent-2: #00D4FF;
+      --green: #30D158;
+      --red: #FF453A;
+      --sidebar-w: 72px;
     }
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      background: var(--bg); color: var(--text);
       -webkit-font-smoothing: antialiased;
-      min-height: 100vh;
-      opacity: 0;
-      transition: opacity 0.4s ease;
+      min-height: 100vh; opacity: 0; transition: opacity 0.4s ease;
     }
     body.loaded { opacity: 1; }
     body.fade-out { opacity: 0; transition: opacity 0.25s ease; }
@@ -38,274 +34,312 @@
     /* ── Sidebar ── */
     .sidebar {
       position: fixed; top: 0; left: 0; bottom: 0;
-      width: var(--sidebar-w);
-      background: var(--bg-sidebar);
+      width: var(--sidebar-w); background: #111;
       border-right: 1px solid var(--border);
-      display: flex; flex-direction: column;
-      z-index: 100;
-      transition: transform 0.3s ease;
+      display: flex; flex-direction: column; align-items: center; z-index: 100;
     }
-    .sidebar-logo {
-      display: flex; align-items: center; gap: 10px;
-      padding: 24px 20px 32px;
-      text-decoration: none;
-    }
-    .sidebar-logo .logo-icon {
+    .sidebar-logo { padding: 24px 0 28px; display: flex; justify-content: center; text-decoration: none; }
+    .logo-icon {
       width: 36px; height: 36px;
-      background: linear-gradient(135deg, var(--cyan), var(--accent));
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px; font-weight: 900; color: #fff;
-      flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 900; color: #fff;
     }
-    .sidebar-logo .logo-text { font-size: 18px; font-weight: 700; color: var(--text); }
-    .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 0 12px; }
+    .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 0 8px; }
     .nav-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 14px; border-radius: 10px;
-      color: var(--text-muted); font-size: 14px; font-weight: 500;
-      text-decoration: none; cursor: pointer;
-      border: none; background: none; font-family: inherit;
-      width: 100%; text-align: left;
-      transition: color 0.2s, background 0.2s;
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; padding: 13px 0; border-radius: 12px;
+      color: var(--text-muted); text-decoration: none;
+      border: none; background: none; cursor: pointer; font-family: inherit;
+      transition: color 0.2s, background 0.2s; position: relative;
     }
-    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-    .nav-item.active { color: #fff; background: var(--accent); }
-    .nav-item .nav-icon { font-size: 18px; width: 24px; text-align: center; line-height: 1; }
-    .nav-item .nav-label { white-space: nowrap; }
-    .sidebar-bottom { padding: 16px 12px 24px; border-top: 1px solid var(--border); margin-top: auto; }
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+    .nav-item.active { color: var(--text); background: rgba(255,255,255,0.1); }
+    .nav-icon { font-size: 20px; line-height: 1; }
+    .nav-tooltip {
+      position: absolute; left: calc(100% + 10px);
+      background: var(--bg-card); color: var(--text); font-size: 12px; font-weight: 600;
+      padding: 5px 10px; border-radius: 8px; white-space: nowrap;
+      pointer-events: none; opacity: 0; transition: opacity 0.15s;
+      border: 1px solid var(--border); z-index: 200;
+    }
+    .nav-item:hover .nav-tooltip { opacity: 1; }
+    .sidebar-bottom { padding: 16px 8px 24px; width: 100%; }
     .nav-item.logout { color: var(--red); }
-    .nav-item.logout:hover { background: rgba(255,85,85,0.1); }
+    .nav-item.logout:hover { background: rgba(255,67,58,0.1); color: var(--red); }
 
     /* ── Content ── */
-    .content {
-      margin-left: var(--sidebar-w);
-      padding: 32px 32px 40px;
-      min-height: 100vh;
-      max-width: calc(720px + var(--sidebar-w));
-    }
-    .page-title { font-size: 24px; font-weight: 700; margin-bottom: 32px; }
+    .content { margin-left: var(--sidebar-w); padding: 0 32px 48px; max-width: calc(760px + var(--sidebar-w)); min-height: 100vh; }
+
+    /* ── Page header ── */
+    .page-header { padding: 36px 0 24px; }
+    .page-title { font-size: 26px; font-weight: 800; letter-spacing: -0.8px; }
+    .page-sub { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 
     /* ── Section ── */
-    .settings-section { margin-bottom: 32px; }
-    .settings-section-title {
-      font-size: 13px; font-weight: 600; color: var(--text-muted);
-      text-transform: uppercase; letter-spacing: 0.5px;
-      margin-bottom: 12px;
+    .section { margin-bottom: 24px; }
+    .section-label {
+      font-size: 11px; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.8px;
+      margin-bottom: 8px; padding: 0 2px;
     }
 
     /* ── Card ── */
-    .card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 14px; padding: 24px;
-    }
+    .card { background: var(--bg-card); border-radius: 16px; overflow: hidden; }
 
-    /* ── Profile ── */
-    .profile-row {
-      display: flex; align-items: center; gap: 16px; margin-bottom: 20px;
+    /* ── Settings rows ── */
+    .settings-row {
+      display: flex; align-items: center;
+      padding: 15px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.15s;
+    }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-row:hover { background: rgba(255,255,255,0.02); }
+    .row-icon {
+      width: 40px; height: 40px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0; margin-right: 14px;
+    }
+    .row-info { flex: 1; }
+    .row-label { font-size: 14px; font-weight: 500; }
+    .row-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .row-right { display: flex; align-items: center; gap: 8px; }
+
+    /* ── Profile card ── */
+    .profile-card {
+      background: var(--bg-card); border-radius: 16px; padding: 24px 20px;
+      display: flex; align-items: center; gap: 16px; margin-bottom: 24px;
     }
     .profile-avatar {
-      width: 56px; height: 56px;
-      background: linear-gradient(135deg, var(--accent), var(--cyan));
-      border-radius: 14px;
+      width: 60px; height: 60px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
       display: flex; align-items: center; justify-content: center;
       font-size: 22px; font-weight: 800; color: #fff;
-      flex-shrink: 0;
     }
     .profile-info { flex: 1; }
-    .profile-name { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
-    .profile-email { font-size: 13px; color: var(--text-muted); }
+    .profile-name { font-size: 18px; font-weight: 700; letter-spacing: -0.4px; }
+    .profile-email { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+    .profile-badge {
+      font-size: 11px; font-weight: 600; color: var(--green);
+      background: rgba(48,209,88,0.12); border: 1px solid rgba(48,209,88,0.25);
+      padding: 3px 10px; border-radius: 100px; margin-top: 6px; display: inline-block;
+    }
 
-    /* ── Form ── */
-    .form-group { margin-bottom: 16px; }
-    .form-group:last-child { margin-bottom: 0; }
-    .form-label {
-      display: block; font-size: 13px; font-weight: 500;
-      color: var(--text-muted); margin-bottom: 6px;
+    /* ── Toggle ── */
+    .toggle { position: relative; width: 44px; height: 26px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0; background: var(--bg-card-2);
+      border-radius: 100px; cursor: pointer; transition: background 0.2s;
     }
-    .form-input {
-      width: 100%; padding: 10px 14px;
-      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-      border-radius: 8px; color: var(--text); font-size: 14px;
-      font-family: inherit; outline: none; transition: border-color 0.2s;
+    .toggle-slider::before {
+      content: ''; position: absolute;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: #fff; top: 3px; left: 3px;
+      transition: transform 0.2s;
     }
-    .form-input:focus { border-color: var(--accent); }
-    .form-input:disabled { opacity: 0.5; cursor: not-allowed; }
+    .toggle input:checked + .toggle-slider { background: var(--accent); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
 
-    /* ── Buttons ── */
-    .btn-primary {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: var(--accent); color: #fff;
-      font-size: 14px; font-weight: 600;
-      padding: 10px 20px; border-radius: 8px;
-      border: none; cursor: pointer; font-family: inherit;
-      transition: opacity 0.2s, transform 0.15s;
+    /* ── Bank row ── */
+    .bank-row {
+      display: flex; align-items: center; padding: 14px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
     }
-    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
-    .btn-primary:active { transform: translateY(0); }
-    .btn-danger {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(255,85,85,0.15); color: var(--red);
-      font-size: 13px; font-weight: 600;
-      padding: 8px 16px; border-radius: 8px;
-      border: 1px solid rgba(255,85,85,0.3);
-      cursor: pointer; font-family: inherit;
-      transition: background 0.2s;
-    }
-    .btn-danger:hover { background: rgba(255,85,85,0.25); }
-    .btn-ghost {
-      color: var(--text-muted); font-size: 13px; font-weight: 500;
-      padding: 8px 14px; border-radius: 8px;
-      background: none; border: none; cursor: pointer;
-      font-family: inherit; transition: color 0.2s, background 0.2s;
-    }
-    .btn-ghost:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-
-    .form-actions { display: flex; gap: 10px; margin-top: 16px; }
-
-    /* ── Bank list ── */
-    .bank-item {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 0; border-bottom: 1px solid var(--border);
-    }
-    .bank-item:last-child { border-bottom: none; }
-    .bank-left { display: flex; align-items: center; gap: 12px; }
+    .bank-row:last-child { border-bottom: none; }
     .bank-icon {
-      width: 40px; height: 40px;
-      background: rgba(26,86,219,0.15); border-radius: 10px;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--bg-card-2);
       display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
+      font-size: 20px; flex-shrink: 0; margin-right: 14px;
     }
-    .bank-name { font-size: 14px; font-weight: 600; }
-    .bank-status { font-size: 12px; color: var(--green); display: flex; align-items: center; gap: 4px; }
-    .bank-status-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
+    .bank-info { flex: 1; }
+    .bank-name { font-size: 14px; font-weight: 500; }
+    .bank-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .bank-badge {
+      font-size: 11px; font-weight: 600; color: var(--green);
+      background: rgba(48,209,88,0.12); border: 1px solid rgba(48,209,88,0.25);
+      padding: 3px 10px; border-radius: 100px;
+    }
 
     /* ── Danger zone ── */
-    .danger-zone {
-      border-color: rgba(255,85,85,0.2);
+    .danger-card { background: rgba(255,67,58,0.05); border: 1px solid rgba(255,67,58,0.15); border-radius: 16px; overflow: hidden; }
+    .danger-row { display: flex; align-items: center; padding: 15px 18px; border-bottom: 1px solid rgba(255,67,58,0.08); }
+    .danger-row:last-child { border-bottom: none; }
+    .danger-info { flex: 1; }
+    .danger-label { font-size: 14px; font-weight: 500; color: var(--red); }
+    .danger-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .btn-danger {
+      padding: 8px 16px; border-radius: 100px;
+      background: rgba(255,67,58,0.15); color: var(--red);
+      font-size: 12px; font-weight: 600; font-family: inherit;
+      border: 1px solid rgba(255,67,58,0.3); cursor: pointer;
+      transition: background 0.2s;
     }
-    .danger-title { font-size: 15px; font-weight: 600; color: var(--red); margin-bottom: 8px; }
-    .danger-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
-
-    /* ── Spinner ── */
-    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-danger:hover { background: rgba(255,67,58,0.25); }
 
     /* ── Toast ── */
     .toast-container { position: fixed; top: 24px; right: 24px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; }
-    .toast { padding: 14px 20px; border-radius: 10px; font-size: 13px; font-weight: 500; backdrop-filter: blur(12px); animation: toastIn 0.35s ease both; max-width: 360px; }
-    .toast.error { background: rgba(255,85,85,0.15); border: 1px solid rgba(255,85,85,0.3); color: #FF5555; }
-    .toast.success { background: rgba(40,200,64,0.15); border: 1px solid rgba(40,200,64,0.3); color: #28C840; }
-    .toast.info { background: rgba(26,86,219,0.15); border: 1px solid rgba(26,86,219,0.3); color: var(--cyan); }
+    .toast { padding: 13px 18px; border-radius: 12px; font-size: 13px; font-weight: 500; backdrop-filter: blur(20px); animation: toastIn 0.35s ease both; max-width: 320px; }
+    .toast.error { background: rgba(255,67,58,0.15); border: 1px solid rgba(255,67,58,0.25); color: #FF453A; }
+    .toast.success { background: rgba(48,209,88,0.12); border: 1px solid rgba(48,209,88,0.25); color: #30D158; }
     .toast.fade-out { animation: toastOut 0.3s ease both; }
-    @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
     @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateX(40px); } }
 
-    /* ── Mobile ── */
-    @media (max-width: 768px) {
-      .sidebar {
-        top: auto; bottom: 0; left: 0; right: 0;
-        width: 100%; height: 64px;
-        flex-direction: row; align-items: center;
-        border-right: none; border-top: 1px solid var(--border);
-        padding: 0 8px;
-      }
-      .sidebar-logo { display: none; }
-      .sidebar-nav { flex-direction: row; gap: 0; padding: 0; justify-content: space-around; width: 100%; }
-      .nav-item { flex-direction: column; gap: 4px; padding: 8px 6px; border-radius: 8px; font-size: 11px; align-items: center; justify-content: center; }
-      .nav-item .nav-icon { font-size: 20px; }
-      .nav-item .nav-label { font-size: 10px; }
-      .sidebar-bottom { display: none; }
-      .content { margin-left: 0; padding: 24px 16px 88px; max-width: 100%; }
+    @media (max-width: 600px) {
+      .content { padding: 0 16px 48px; }
+      .profile-card { flex-direction: column; text-align: center; }
     }
   </style>
 </head>
 <body>
   <div class="toast-container" id="toast-container"></div>
 
-  <!-- Sidebar -->
   <aside class="sidebar">
-    <a href="/dashboard.html" class="sidebar-logo">
-      <div class="logo-icon">H</div>
-      <span class="logo-text">Holdwise</span>
-    </a>
+    <a href="/dashboard.html" class="sidebar-logo"><div class="logo-icon">H</div></a>
     <nav class="sidebar-nav">
-      <a href="/dashboard.html" class="nav-item">
-        <span class="nav-icon">&#127968;</span>
-        <span class="nav-label">Dashboard</span>
+      <a href="/dashboard.html" class="nav-item" data-label="Home">
+        <span class="nav-icon">⌂</span><span class="nav-tooltip">Dashboard</span>
       </a>
-      <a href="/transactions.html" class="nav-item">
-        <span class="nav-icon">&#128179;</span>
-        <span class="nav-label">Transactions</span>
+      <a href="/transactions.html" class="nav-item" data-label="Txns">
+        <span class="nav-icon">↕</span><span class="nav-tooltip">Transactions</span>
       </a>
-      <a href="/savings.html" class="nav-item">
-        <span class="nav-icon">&#128274;</span>
-        <span class="nav-label">Savings</span>
+      <a href="/savings.html" class="nav-item" data-label="Save">
+        <span class="nav-icon">🔐</span><span class="nav-tooltip">Savings</span>
       </a>
-      <a href="/settings.html" class="nav-item active">
-        <span class="nav-icon">&#9881;&#65039;</span>
-        <span class="nav-label">Settings</span>
+      <a href="/settings.html" class="nav-item active" data-label="More">
+        <span class="nav-icon">⚙</span><span class="nav-tooltip">Settings</span>
       </a>
     </nav>
     <div class="sidebar-bottom">
       <button class="nav-item logout" onclick="handleLogout()">
-        <span class="nav-icon">&#128682;</span>
-        <span class="nav-label">Log Out</span>
+        <span class="nav-icon">⏻</span><span class="nav-tooltip">Log Out</span>
       </button>
     </div>
   </aside>
 
-  <!-- Main Content -->
-  <div class="content">
-    <h1 class="page-title">Settings</h1>
+  <main class="content">
+    <div class="page-header">
+      <div class="page-title">Settings</div>
+      <div class="page-sub">Manage your account and preferences</div>
+    </div>
 
-    <!-- Profile Section -->
-    <div class="settings-section">
-      <div class="settings-section-title">Profile</div>
-      <div class="card">
-        <div class="profile-row">
-          <div class="profile-avatar" id="profile-avatar">?</div>
-          <div class="profile-info">
-            <div class="profile-name" id="profile-name">Loading...</div>
-            <div class="profile-email" id="profile-email">Loading...</div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Full Name</label>
-          <input type="text" class="form-input" id="setting-name" placeholder="Your name" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Email</label>
-          <input type="email" class="form-input" id="setting-email" disabled />
-        </div>
-        <div class="form-actions">
-          <button class="btn-primary" onclick="saveProfile()">Save Changes</button>
-        </div>
+    <!-- Profile -->
+    <div class="profile-card">
+      <div class="profile-avatar" id="avatar-initial">?</div>
+      <div class="profile-info">
+        <div class="profile-name" id="profile-name">Loading...</div>
+        <div class="profile-email" id="profile-email">—</div>
+        <div class="profile-badge">Active</div>
       </div>
     </div>
 
     <!-- Connected Banks -->
-    <div class="settings-section">
-      <div class="settings-section-title">Connected Banks</div>
-      <div class="card">
-        <div id="banks-list">
-          <div style="text-align:center;padding:16px;color:var(--text-muted);font-size:14px;">
-            <span class="spinner"></span> Checking connections...
+    <div class="section">
+      <div class="section-label">Connected Banks</div>
+      <div class="card" id="banks-card">
+        <div class="bank-row">
+          <div class="bank-icon">🏦</div>
+          <div class="bank-info">
+            <div class="bank-name">No banks connected</div>
+            <div class="bank-sub">Go to dashboard to connect your bank via Plaid</div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preferences -->
+    <div class="section">
+      <div class="section-label">Preferences</div>
+      <div class="card">
+        <div class="settings-row">
+          <div class="row-icon" style="background:rgba(108,92,231,0.15)">🔔</div>
+          <div class="row-info">
+            <div class="row-label">Spending Alerts</div>
+            <div class="row-sub">Get notified when you overspend in a category</div>
+          </div>
+          <div class="row-right">
+            <label class="toggle">
+              <input type="checkbox" checked onchange="showToast('Spending alerts ' + (this.checked ? 'enabled' : 'disabled'), 'success')" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="row-icon" style="background:rgba(0,212,255,0.1)">📊</div>
+          <div class="row-info">
+            <div class="row-label">Monthly Summary</div>
+            <div class="row-sub">Receive a monthly spending report by email</div>
+          </div>
+          <div class="row-right">
+            <label class="toggle">
+              <input type="checkbox" onchange="showToast('Monthly summary ' + (this.checked ? 'enabled' : 'disabled'), 'success')" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="row-icon" style="background:rgba(48,209,88,0.1)">💰</div>
+          <div class="row-info">
+            <div class="row-label">Savings Reminders</div>
+            <div class="row-sub">Weekly reminder to add to your lockbox</div>
+          </div>
+          <div class="row-right">
+            <label class="toggle">
+              <input type="checkbox" checked onchange="showToast('Savings reminders ' + (this.checked ? 'enabled' : 'disabled'), 'success')" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account -->
+    <div class="section">
+      <div class="section-label">Account</div>
+      <div class="card">
+        <div class="settings-row" style="cursor:pointer" onclick="showToast('Password reset email sent!', 'success')">
+          <div class="row-icon" style="background:rgba(255,159,10,0.1)">🔑</div>
+          <div class="row-info">
+            <div class="row-label">Change Password</div>
+            <div class="row-sub">Send a password reset link to your email</div>
+          </div>
+          <div class="row-right" style="color:var(--text-muted);font-size:18px">›</div>
+        </div>
+        <div class="settings-row" style="cursor:pointer" onclick="handleLogout()">
+          <div class="row-icon" style="background:rgba(255,67,58,0.08)">⏻</div>
+          <div class="row-info">
+            <div class="row-label">Log Out</div>
+            <div class="row-sub">Sign out of your Holdwise account</div>
+          </div>
+          <div class="row-right" style="color:var(--text-muted);font-size:18px">›</div>
         </div>
       </div>
     </div>
 
     <!-- Danger Zone -->
-    <div class="settings-section">
-      <div class="settings-section-title">Danger Zone</div>
-      <div class="card danger-zone">
-        <div class="danger-title">Delete Account</div>
-        <div class="danger-desc">Permanently delete your account and all associated data. This action cannot be undone.</div>
-        <button class="btn-danger" onclick="confirmDeleteAccount()">Delete My Account</button>
+    <div class="section">
+      <div class="section-label">Danger Zone</div>
+      <div class="danger-card">
+        <div class="danger-row">
+          <div class="danger-info">
+            <div class="danger-label">Clear Savings Data</div>
+            <div class="danger-sub">Reset your lockbox balance and goal to zero</div>
+          </div>
+          <button class="btn-danger" onclick="clearSavings()">Clear</button>
+        </div>
+        <div class="danger-row">
+          <div class="danger-info">
+            <div class="danger-label">Delete Account</div>
+            <div class="danger-sub">Permanently delete your account and all associated data</div>
+          </div>
+          <button class="btn-danger" onclick="showToast('Please contact support to delete your account.', 'error')">Delete</button>
+        </div>
       </div>
     </div>
-  </div>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -313,30 +347,23 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzbWlndWhuZGdqbXlnYnhoYWdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MDY2NTYsImV4cCI6MjA5MDM4MjY1Nn0.xhPxYmIxBdJu856e63WQna_fQTC1FRqILZcuctemIpo';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let currentUser = null;
-
-    (async function() {
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) { window.location.href = '/login.html'; return; }
-      document.body.classList.add('loaded');
-      currentUser = session.user;
-      loadProfile();
-      loadBanks();
-    })();
-
     function navigateTo(url) {
       document.body.classList.add('fade-out');
-      setTimeout(() => { window.location.href = url; }, 250);
+      setTimeout(() => window.location.href = url, 220);
     }
 
-    function showToast(msg, type = 'info') {
-      const container = document.getElementById('toast-container');
-      if (!container) return;
-      const toast = document.createElement('div');
-      toast.className = `toast ${type}`;
-      toast.textContent = msg;
-      container.appendChild(toast);
-      setTimeout(() => { toast.classList.add('fade-out'); setTimeout(() => toast.remove(), 300); }, 4000);
+    function showToast(msg, type = 'success') {
+      const c = document.getElementById('toast-container');
+      const t = document.createElement('div');
+      t.className = `toast ${type}`; t.textContent = msg; c.appendChild(t);
+      setTimeout(() => { t.classList.add('fade-out'); setTimeout(() => t.remove(), 300); }, 4000);
+    }
+
+    function clearSavings() {
+      if (!confirm('Clear all savings data? This cannot be undone.')) return;
+      localStorage.removeItem('holdwise_lockbox');
+      localStorage.removeItem('holdwise_lockbox_goal');
+      showToast('Savings data cleared.', 'success');
     }
 
     async function handleLogout() {
@@ -346,113 +373,21 @@
       navigateTo('/login.html');
     }
 
-    async function getAuthHeaders() {
+    (async function() {
       const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) return {};
-      return { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json' };
-    }
-    async function authFetch(url, options = {}) {
-      const headers = await getAuthHeaders();
-      const res = await fetch(url, { ...options, headers: { ...headers, ...options.headers } });
-      if (res.status === 401) { await supabaseClient.auth.signOut(); window.location.href = '/login.html'; throw new Error('Session expired'); }
-      return res;
-    }
+      if (!session) { navigateTo('/login.html'); return; }
 
-    // ── Profile ──
-    function loadProfile() {
-      if (!currentUser) return;
-      const name = currentUser.user_metadata?.full_name || '';
-      const email = currentUser.email || '';
-      const initial = name ? name.charAt(0).toUpperCase() : email.charAt(0).toUpperCase();
+      const user = session.user;
+      const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
+      const email = user.email || '—';
+      const initial = name[0].toUpperCase();
 
-      document.getElementById('profile-avatar').textContent = initial;
-      document.getElementById('profile-name').textContent = name || 'No name set';
+      document.getElementById('profile-name').textContent = name;
       document.getElementById('profile-email').textContent = email;
-      document.getElementById('setting-name').value = name;
-      document.getElementById('setting-email').value = email;
-    }
+      document.getElementById('avatar-initial').textContent = initial;
 
-    async function saveProfile() {
-      const name = document.getElementById('setting-name').value.trim();
-      if (!name) { showToast('Name cannot be empty.', 'error'); return; }
-
-      try {
-        const { error } = await supabaseClient.auth.updateUser({
-          data: { full_name: name }
-        });
-        if (error) throw error;
-        document.getElementById('profile-name').textContent = name;
-        document.getElementById('profile-avatar').textContent = name.charAt(0).toUpperCase();
-        showToast('Profile updated!', 'success');
-      } catch (err) {
-        showToast('Failed to update profile.', 'error');
-      }
-    }
-
-    // ── Banks ──
-    async function loadBanks() {
-      const container = document.getElementById('banks-list');
-      try {
-        const res = await authFetch('/api/balances');
-        const data = await res.json();
-        const accounts = data.accounts || [];
-
-        if (accounts.length === 0) {
-          container.innerHTML = `
-            <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:14px;">
-              <p style="margin-bottom:12px;">No bank accounts connected.</p>
-              <a href="/dashboard.html" style="color:var(--accent);font-weight:600;text-decoration:none;">Go to Dashboard to connect a bank</a>
-            </div>`;
-          return;
-        }
-
-        container.innerHTML = accounts.map(acc => `
-          <div class="bank-item">
-            <div class="bank-left">
-              <div class="bank-icon">&#127974;</div>
-              <div>
-                <div class="bank-name">${acc.name || acc.official_name || 'Bank Account'}</div>
-                <div class="bank-status"><span class="bank-status-dot"></span> Connected</div>
-              </div>
-            </div>
-            <button class="btn-danger" onclick="disconnectBank()">Disconnect</button>
-          </div>
-        `).join('');
-      } catch (err) {
-        container.innerHTML = `
-          <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:14px;">
-            No bank accounts connected.
-            <br><a href="/dashboard.html" style="color:var(--accent);font-weight:600;text-decoration:none;">Go to Dashboard to connect</a>
-          </div>`;
-      }
-    }
-
-    async function disconnectBank() {
-      if (!confirm('Are you sure you want to disconnect this bank account? You will need to reconnect it to see your data again.')) return;
-
-      try {
-        // Clear the stored access token from user metadata
-        const { error } = await supabaseClient.auth.updateUser({
-          data: { plaid_access_token: null, plaid_item_id: null }
-        });
-        if (error) throw error;
-        showToast('Bank disconnected successfully.', 'success');
-        loadBanks();
-      } catch (err) {
-        showToast('Failed to disconnect bank.', 'error');
-      }
-    }
-
-    function confirmDeleteAccount() {
-      if (!confirm('This will permanently delete your account and all data. Are you absolutely sure?')) return;
-      if (!confirm('Last chance — this cannot be undone. Type OK in the next prompt to confirm.')) return;
-      const typed = prompt('Type "DELETE" to confirm account deletion:');
-      if (typed !== 'DELETE') {
-        showToast('Account deletion cancelled.', 'info');
-        return;
-      }
-      showToast('Account deletion is not available in this version. Contact support.', 'info');
-    }
+      document.body.classList.add('loaded');
+    })();
   </script>
 </body>
 </html>
