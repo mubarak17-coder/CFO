@@ -69,7 +69,7 @@
     .nav-item.logout:hover { background: rgba(255,67,58,0.1); color: var(--red); }
 
     /* ── Content ── */
-    .content { margin-left: var(--sidebar-w); padding: 0 32px 48px; max-width: calc(900px + var(--sidebar-w)); min-height: 100vh; }
+    .content { margin-left: var(--sidebar-w); padding: 0 32px 48px; min-height: 100vh; }
 
     /* ── Page header ── */
     .page-header { padding: 36px 0 20px; display: flex; align-items: center; justify-content: space-between; }
@@ -99,14 +99,21 @@
     }
     .filter-select option { background: var(--bg-card); }
 
+    /* ── 2-col layout ── */
+    .tx-grid {
+      display: grid; grid-template-columns: 1fr 300px;
+      gap: 16px; align-items: start;
+    }
+    .tx-sidebar-col { display: flex; flex-direction: column; gap: 14px; }
+
     /* ── Summary pills ── */
-    .summary-row { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .summary-row { display: flex; gap: 10px; margin-bottom: 0; flex-direction: column; }
     .summary-pill {
       background: var(--bg-card); border-radius: 12px;
-      padding: 12px 18px; flex: 1; min-width: 120px;
+      padding: 14px 18px;
     }
     .summary-label { font-size: 11px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
-    .summary-value { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
+    .summary-value { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
     .summary-value.red { color: var(--red); }
     .summary-value.green { color: var(--green); }
 
@@ -155,6 +162,11 @@
     @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
     @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateX(40px); } }
 
+    @media (max-width: 900px) {
+      .tx-grid { grid-template-columns: 1fr; }
+      .summary-row { flex-direction: row; flex-wrap: wrap; }
+      .summary-pill { flex: 1; min-width: 120px; }
+    }
     @media (max-width: 600px) {
       .content { padding: 0 16px 48px; }
       .toolbar { flex-direction: column; align-items: stretch; }
@@ -195,46 +207,53 @@
       </div>
     </div>
 
-    <!-- Summary -->
-    <div class="summary-row">
-      <div class="summary-pill">
-        <div class="summary-label">Total Transactions</div>
-        <div class="summary-value" id="total-count">—</div>
-      </div>
-      <div class="summary-pill">
-        <div class="summary-label">Total Spent</div>
-        <div class="summary-value red" id="total-spent">—</div>
-      </div>
-      <div class="summary-pill">
-        <div class="summary-label">Total Income</div>
-        <div class="summary-value green" id="total-income">—</div>
-      </div>
-    </div>
+    <div class="tx-grid">
+      <!-- Left: toolbar + list -->
+      <div>
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <div class="search-wrap">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input class="search-input" id="search-input" type="text" placeholder="Search transactions..." oninput="filterTransactions()" />
+          </div>
+          <select class="filter-select" id="filter-type" onchange="filterTransactions()">
+            <option value="all">All types</option>
+            <option value="spent">Spent</option>
+            <option value="income">Income</option>
+          </select>
+          <select class="filter-select" id="filter-cat" onchange="filterTransactions()">
+            <option value="all">All categories</option>
+          </select>
+        </div>
 
-    <!-- Toolbar -->
-    <div class="toolbar">
-      <div class="search-wrap">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        <input class="search-input" id="search-input" type="text" placeholder="Search transactions..." oninput="filterTransactions()" />
+        <!-- Transactions card -->
+        <div class="card">
+          <div class="card-title">
+            <span>All Transactions</span>
+            <span class="card-title-sub" id="tx-showing"></span>
+          </div>
+          <div id="tx-list">
+            <div class="empty-state">Connect a bank account to see transactions</div>
+          </div>
+        </div>
       </div>
-      <select class="filter-select" id="filter-type" onchange="filterTransactions()">
-        <option value="all">All types</option>
-        <option value="spent">Spent</option>
-        <option value="income">Income</option>
-      </select>
-      <select class="filter-select" id="filter-cat" onchange="filterTransactions()">
-        <option value="all">All categories</option>
-      </select>
-    </div>
 
-    <!-- Transactions card -->
-    <div class="card">
-      <div class="card-title">
-        <span>All Transactions</span>
-        <span class="card-title-sub" id="tx-showing"></span>
-      </div>
-      <div id="tx-list">
-        <div class="empty-state">Connect a bank account to see transactions</div>
+      <!-- Right: summary pills -->
+      <div class="tx-sidebar-col">
+        <div class="summary-row">
+          <div class="summary-pill">
+            <div class="summary-label">Total Transactions</div>
+            <div class="summary-value" id="total-count">—</div>
+          </div>
+          <div class="summary-pill">
+            <div class="summary-label">Total Spent</div>
+            <div class="summary-value red" id="total-spent">—</div>
+          </div>
+          <div class="summary-pill">
+            <div class="summary-label">Total Income</div>
+            <div class="summary-value green" id="total-income">—</div>
+          </div>
+        </div>
       </div>
     </div>
   </main>
