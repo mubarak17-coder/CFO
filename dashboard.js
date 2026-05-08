@@ -105,6 +105,18 @@ function saveGoalEdit() {
   updateLockboxUI();
 }
 
+// ── Count-up animation (ease-out cubic) ──
+function countUp(el, endVal, duration, formatter) {
+  const startTime = performance.now();
+  function tick(now) {
+    const progress = Math.min((now - startTime) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = formatter(eased * endVal);
+    if (progress < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
 // ── Formatting helpers ──
 function formatCurrency(amount) {
   return new Intl.NumberFormat('en-US', {
@@ -187,7 +199,13 @@ async function loadDashboardData() {
 function renderBalances(data) {
   const total = data.total_balance || 0;
   const count = (data.accounts || []).length;
-  document.getElementById('total-balance').textContent = formatCurrency(total);
+
+  countUp(
+    document.getElementById('total-balance'),
+    total,
+    1200,
+    v => formatCurrency(v)
+  );
   document.getElementById('accounts-count').textContent =
     count > 0 ? `${count} account${count > 1 ? 's' : ''} connected` : 'No accounts connected';
 
@@ -226,7 +244,7 @@ function renderTransactions(transactions) {
 
   allTransactions = transactions;
   txPage = 0;
-  countEl.textContent = transactions.length;
+  countUp(countEl, transactions.length, 800, v => String(Math.round(v)));
 
   if (transactions.length === 0) {
     container.innerHTML = '<div class="empty-state">Connect a bank account to see transactions</div>';
@@ -238,7 +256,7 @@ function renderTransactions(transactions) {
   transactions.forEach(tx => {
     if (tx.amount > 0) totalSpending += tx.amount;
   });
-  spendingEl.textContent = formatCurrency(totalSpending);
+  countUp(spendingEl, totalSpending, 1200, v => formatCurrency(v));
 
   const visible = transactions.slice(0, TX_PER_PAGE);
   const hasMore = transactions.length > TX_PER_PAGE;
