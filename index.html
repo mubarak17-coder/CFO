@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Holdwise — Smart Wealth Management for Students</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:         #0A0F1E;
+      --bg-card:    #111827;
+      --border:     rgba(255,255,255,0.08);
+      --text:       #FFFFFF;
+      --text-muted: rgba(255,255,255,0.5);
+      --accent:     #1A56DB;
+      --cyan:       #00D4FF;
+      --green:      #28C840;
+      --red:        #FF5555;
+    }
+
+    body.light {
+      --bg:         #F4F6FB;
+      --bg-card:    #FFFFFF;
+      --border:     rgba(0,0,0,0.08);
+      --text:       #0D1B3E;
+      --text-muted: rgba(13,27,62,0.5);
+      --accent:     #1A56DB;
+      --cyan:       #1A6FC7;
+      color-scheme: light;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* ── Navbar ── */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--cyan), var(--accent));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 900; color: #fff;
+    }
+    .logo-text { font-size: 17px; font-weight: 700; color: var(--text); }
+
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none; font-size: 14px; font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+
+    .btn-ghost {
+      color: var(--text-muted);
+      font-size: 14px; font-weight: 500;
+      text-decoration: none; padding: 7px 14px;
+      border-radius: 8px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .btn-ghost:hover { color: var(--text); background: var(--border); }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent);
+      color: #fff; font-size: 14px; font-weight: 600;
+      padding: 9px 20px; border-radius: 8px;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    @media (max-width: 768px) {
+      .navbar { padding: 0 20px; }
+      .nav-links { display: none; }
+    }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 140px 48px 100px;
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      align-items: center;
+      gap: 64px;
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 1024px) {
+      .hero { grid-template-columns: 1fr; padding: 120px 24px 80px; }
+      .hero-right { display: none; }
+    }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: 100px;
+      padding: 5px 14px 5px 10px;
+      font-size: 12px; font-weight: 600;
+      color: var(--cyan);
+      margin-bottom: 28px;
+    }
+
+    body.light .badge {
+      background: rgba(46,117,182,0.08);
+      border-color: rgba(46,117,182,0.25);
+    }
+
+    .badge-dot {
+      width: 6px; height: 6px;
+      background: var(--cyan);
+      border-radius: 50%;
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+    .headline {
+      font-size: clamp(40px, 6vw, 72px);
+      font-weight: 900;
+      line-height: 1.06;
+      letter-spacing: -2px;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+
+    .subheadline {
+      font-size: clamp(16px, 2vw, 19px);
+      line-height: 1.65;
+      color: var(--text-muted);
+      max-width: 520px;
+      margin-bottom: 40px;
+    }
+
+    .subheadline strong { color: var(--text); font-weight: 600; }
+
+    .hero-cta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+
+    .btn-lg {
+      font-size: 15px; padding: 13px 32px;
+    }
+
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 15px; font-weight: 500;
+      padding: 12px 28px; border-radius: 8px;
+      text-decoration: none; cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--text); }
+
+    .cta-note { font-size: 13px; color: var(--text-muted); margin-top: 12px; }
+
+    /* ── Finance Card ── */
+    .finance-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    }
+
+    body.light .finance-card { box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+
+    .fc-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .fc-label {
+      font-size: 12px; font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.6px;
+    }
+
+    .fc-live {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 600; color: var(--green);
+    }
+
+    .fc-live-dot {
+      width: 5px; height: 5px;
+      background: var(--green); border-radius: 50%;
+      animation: blink 1.8s ease-in-out infinite;
+    }
+
+    .fc-section { margin-bottom: 18px; }
+
+    .fc-section-label {
+      font-size: 11px; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+
+    .fc-mrr-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+
+    .fc-mrr-val {
+      font-size: 28px; font-weight: 800;
+      color: var(--text); letter-spacing: -1px;
+    }
+
+    .fc-delta {
+      font-size: 12px; font-weight: 600; color: var(--green);
+      background: rgba(40,200,64,0.1);
+      padding: 2px 8px; border-radius: 100px;
+    }
+
+    .fc-chart {
+      width: 100%; height: 60px; display: block;
+    }
+
+    .fc-divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+    .fc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .fc-metric {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px;
+    }
+
+    body.light .fc-metric { background: #F4F6FB; }
+
+    .fc-metric-label {
+      font-size: 10px; font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 5px;
+    }
+
+    .fc-metric-val {
+      font-size: 18px; font-weight: 800;
+      color: var(--text); letter-spacing: -0.5px;
+    }
+
+    .fc-metric-sub { font-size: 11px; margin-top: 2px; }
+    .pos { color: var(--green); }
+    .neg { color: var(--red); }
+
+    /* ── Stats ── */
+    .stats {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 48px;
+    }
+
+    .stats-inner {
+      max-width: 1160px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 32px; text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .stats { padding: 40px 24px; }
+      .stats-inner { grid-template-columns: 1fr; gap: 24px; }
+    }
+
+    .stat-val {
+      font-size: 36px; font-weight: 900;
+      letter-spacing: -1px; color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .stat-val span { color: var(--accent); }
+
+    .stat-label {
+      font-size: 13px; color: var(--text-muted);
+      font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px;
+    }
+
+    /* ── Features ── */
+    .features {
+      padding: 100px 48px;
+      max-width: 1160px; margin: 0 auto;
+    }
+
+    @media (max-width: 768px) { .features { padding: 64px 24px; } }
+
+    .section-eyebrow {
+      font-size: 12px; font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 900; letter-spacing: -1px;
+      color: var(--text); margin-bottom: 56px;
+      line-height: 1.1;
+    }
+
+    .feat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) { .feat-grid { grid-template-columns: 1fr; } }
+
+    .feat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px 24px;
+      transition: border-color 0.2s;
+    }
+
+    .feat-card:hover { border-color: var(--accent); }
+
+    /* ── Spotlight / Glow Card ── */
+    .glow-card {
+      --x: -9999;
+      --y: -9999;
+      --spotlight: 260px;
+      --hue: 220;
+      background-color: var(--bg-card);
+      background-image: radial-gradient(
+        var(--spotlight) var(--spotlight) at calc(var(--x) * 1px) calc(var(--y) * 1px),
+        hsl(var(--hue) 85% 65% / 0.12),
+        transparent
+      );
+      background-attachment: fixed;
+      border-color: transparent;
+    }
+
+    .glow-card::before {
+      content: '';
+      pointer-events: none;
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      border: 1px solid transparent;
+      background-image: radial-gradient(
+        calc(var(--spotlight) * 0.7) calc(var(--spotlight) * 0.7) at
+        calc(var(--x) * 1px) calc(var(--y) * 1px),
+        hsl(var(--hue) 85% 60% / 0.9),
+        transparent
+      );
+      background-attachment: fixed;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.35s;
+    }
+
+    .glow-card:hover::before { opacity: 1; }
+
+    .feat-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 18px;
+    }
+
+    .feat-icon-1 { background: rgba(74,144,226,0.1); border: 1px solid rgba(74,144,226,0.2); }
+    .feat-icon-2 { background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.18); }
+    .feat-icon-3 { background: rgba(245,200,66,0.08); border: 1px solid rgba(245,200,66,0.18); }
+
+    .feat-icon svg { width: 22px; height: 22px; }
+
+    .feat-title {
+      font-size: 16px; font-weight: 700;
+      color: var(--text); margin-bottom: 8px;
+    }
+
+    .feat-desc {
+      font-size: 14px; line-height: 1.6;
+      color: var(--text-muted);
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      border-top: 1px solid var(--border);
+      padding: 100px 48px;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) { .cta-section { padding: 64px 24px; } }
+
+    .cta-inner { max-width: 600px; margin: 0 auto; }
+
+    .cta-title {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 900; letter-spacing: -1.5px;
+      color: var(--text); margin-bottom: 16px; line-height: 1.08;
+    }
+
+    .cta-sub {
+      font-size: 17px; color: var(--text-muted);
+      line-height: 1.6; margin-bottom: 40px;
+    }
+
+    .cta-btns {
+      display: flex; align-items: center; justify-content: center;
+      gap: 14px; flex-wrap: wrap;
+    }
+
+    .cta-note { font-size: 13px; color: var(--text-muted); margin-top: 16px; }
+
+    /* ── Footer ── */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 48px;
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) { .footer { padding: 28px 24px; flex-direction: column; align-items: flex-start; } }
+
+    .footer-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .footer-logo-icon {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, var(--cyan), var(--accent));
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 900; color: #fff;
+    }
+    .footer-logo-text { font-size: 14px; font-weight: 700; color: var(--text-muted); }
+
+    .footer-copy { font-size: 13px; color: var(--text-muted); }
+
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a {
+      font-size: 13px; color: var(--text-muted);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+
+    /* ── Theme toggle ── */
+    .theme-toggle {
+      position: fixed;
+      bottom: 28px; right: 28px;
+      z-index: 200;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+      transition: background 0.3s, border-color 0.3s, transform 0.15s;
+      outline: none;
+    }
+    .theme-toggle:hover { transform: scale(1.08); }
+    .theme-toggle:active { transform: scale(0.94); }
+
+    .icon-moon, .icon-sun { position: absolute; transition: opacity 0.25s, transform 0.3s; }
+    .icon-sun  { opacity: 0; transform: rotate(90deg) scale(0.7); }
+    .icon-moon { opacity: 1; }
+    body.light .icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.7); }
+    body.light .icon-sun  { opacity: 1; transform: rotate(0deg) scale(1); }
+
+    /* ── Fade-in on scroll ── */
+    [data-reveal] {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    [data-reveal].visible { opacity: 1; transform: translateY(0); }
+
+    /* Page fade */
+    body { opacity: 0; transition: opacity 0.4s ease, background 0.3s, color 0.3s; }
+    body.loaded { opacity: 1; }
+    body.fade-out { opacity: 0; transition: opacity 0.25s ease; }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <a href="#hero" class="logo">
+    <div class="logo-icon">H</div>
+    <span class="logo-text">Holdwise</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#cta">Demo</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="/login" class="btn-ghost">Login</a>
+    <a href="/login" class="btn-primary">Get Started →</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section id="hero">
+  <div class="hero">
+    <div class="hero-left">
+      <div class="badge">
+        <span class="badge-dot"></span>
+        Holdwise · v1.0 · 2026
+      </div>
+
+      <h1 class="headline">Smart Wealth<br/>Management<br/>for Students.</h1>
+
+      <p class="subheadline">
+        Connect your <strong>German bank accounts</strong> securely and gain
+        AI-powered insights into your spending. Master your budget with Holdwise.
+      </p>
+
+      <div class="hero-cta">
+        <a href="/login" class="btn-primary btn-lg">Get Started →</a>
+        <a href="#features" class="btn-outline">See Features</a>
+      </div>
+      <p class="cta-note">No credit card required · Read-only access · PSD2 compliant</p>
+    </div>
+
+    <div class="hero-right">
+      <div class="finance-card glow-card" style="--hue:210">
+        <div class="fc-header">
+          <span class="fc-label">Finance Overview</span>
+          <span class="fc-live"><span class="fc-live-dot"></span>Live</span>
+        </div>
+
+        <div class="fc-section">
+          <div class="fc-section-label">Monthly Recurring Revenue</div>
+          <div class="fc-mrr-row">
+            <span class="fc-mrr-val">$162k</span>
+            <span class="fc-delta">↑ 8.0% vs plan</span>
+          </div>
+          <svg class="fc-chart" viewBox="0 0 332 60" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#00D4FF" stop-opacity="0.15"/>
+                <stop offset="100%" stop-color="#00D4FF" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,54 C55,48 110,36 166,24 C222,12 276,4 332,2 L332,60 L0,60 Z"
+              fill="url(#chartFill)"/>
+            <path d="M0,54 C55,48 110,36 166,24 C222,12 276,4 332,2"
+              fill="none" stroke="#00D4FF" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="332" cy="2" r="3.5" fill="#00D4FF"/>
+            <text x="0"   y="60" font-size="8" fill="rgba(128,160,200,0.5)" font-family="Inter,sans-serif">Jan</text>
+            <text x="154" y="60" font-size="8" fill="rgba(128,160,200,0.5)" font-family="Inter,sans-serif">Feb</text>
+            <text x="310" y="60" font-size="8" fill="rgba(128,160,200,0.5)" font-family="Inter,sans-serif">Mar</text>
+          </svg>
+        </div>
+
+        <div class="fc-divider"></div>
+
+        <div class="fc-grid">
+          <div class="fc-metric">
+            <div class="fc-metric-label">Expenses Budget</div>
+            <div class="fc-metric-val">$132.5k</div>
+            <div class="fc-metric-sub pos">Q1 2026 plan</div>
+          </div>
+          <div class="fc-metric">
+            <div class="fc-metric-label">Actual Spend</div>
+            <div class="fc-metric-val">$135k</div>
+            <div class="fc-metric-sub neg">↑ 1.9% over</div>
+          </div>
+          <div class="fc-metric">
+            <div class="fc-metric-label">Net Profit</div>
+            <div class="fc-metric-val">$58.5k</div>
+            <div class="fc-metric-sub pos">↑ 11.4% vs plan</div>
+          </div>
+          <div class="fc-metric">
+            <div class="fc-metric-label">Op. Cushion</div>
+            <div class="fc-metric-val">39%</div>
+            <div class="fc-metric-sub pos">$35k / $90k goal</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<div class="stats">
+  <div class="stats-inner">
+    <div data-reveal>
+      <div class="stat-val"><span>500+</span></div>
+      <div class="stat-label">German Banks Supported</div>
+    </div>
+    <div data-reveal>
+      <div class="stat-val"><span>AES-256</span></div>
+      <div class="stat-label">Bank-Level Encryption</div>
+    </div>
+    <div data-reveal>
+      <div class="stat-val"><span>PSD2</span></div>
+      <div class="stat-label">Fully Compliant</div>
+    </div>
+  </div>
+</div>
+
+<!-- Features -->
+<section class="features" id="features">
+  <div class="section-eyebrow" data-reveal>Core Features</div>
+  <h2 class="section-title" data-reveal>Secure, Smart, Connected.</h2>
+
+  <div class="feat-grid">
+    <div class="feat-card glow-card" data-reveal style="--hue:220">
+      <div class="feat-icon feat-icon-1">
+        <svg viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="14" width="3.5" height="7" rx="1" fill="#1A56DB"/>
+          <rect x="8.5" y="9" width="3.5" height="12" rx="1" fill="#1A56DB" opacity="0.7"/>
+          <rect x="14" y="5" width="3.5" height="16" rx="1" fill="#1A56DB" opacity="0.5"/>
+          <rect x="19.5" y="2" width="3.5" height="19" rx="1" fill="#1A56DB" opacity="0.3"/>
+          <polyline points="3,15 8.5,10 14,6 23,3" stroke="#00D4FF" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="23" cy="3" r="1.5" fill="#00D4FF"/>
+        </svg>
+      </div>
+      <div class="feat-title">Bank-Level Security</div>
+      <p class="feat-desc">
+        Your data is protected with bank-level encryption (AES-256) and read-only access.
+        Your credentials never touch our servers — authentication is handled securely by Plaid.
+      </p>
+    </div>
+
+    <div class="feat-card glow-card" data-reveal style="--hue:195">
+      <div class="feat-icon feat-icon-2">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9.5" stroke="#00D4FF" stroke-width="1.4" stroke-dasharray="3 2.5" opacity="0.35"/>
+          <circle cx="12" cy="12" r="6.5" stroke="#00D4FF" stroke-width="1.4" opacity="0.6"/>
+          <circle cx="12" cy="12" r="3.5" stroke="#00D4FF" stroke-width="1.5" opacity="0.9"/>
+          <circle cx="12" cy="12" r="1.6" fill="#00D4FF"/>
+          <line x1="19" y1="5" x2="13.2" y2="10.8" stroke="#00D4FF" stroke-width="1.5" stroke-linecap="round"/>
+          <polyline points="16,5 19,5 19,8" stroke="#00D4FF" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+      <div class="feat-title">500+ German Banks</div>
+      <p class="feat-desc">
+        Direct integration with 500+ German banks like Sparkasse, N26, and
+        Deutsche Bank via Plaid. Connect multiple accounts in seconds.
+      </p>
+    </div>
+
+    <div class="feat-card glow-card" data-reveal style="--hue:45">
+      <div class="feat-icon feat-icon-3">
+        <svg viewBox="0 0 24 24" fill="none">
+          <line x1="12" y1="3" x2="12" y2="20" stroke="#F5C842" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="5" y1="6" x2="19" y2="6" stroke="#F5C842" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="5" y1="6" x2="4" y2="12" stroke="#F5C842" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="5" y1="6" x2="6" y2="12" stroke="#F5C842" stroke-width="1.2" stroke-linecap="round"/>
+          <path d="M2.5,12 Q5,14.5 7.5,12" stroke="#F5C842" stroke-width="1.4" stroke-linecap="round" fill="rgba(245,200,66,0.1)"/>
+          <line x1="19" y1="6" x2="18" y2="10" stroke="#F5C842" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="19" y1="6" x2="20" y2="10" stroke="#F5C842" stroke-width="1.2" stroke-linecap="round"/>
+          <path d="M16.5,10 Q19,12.5 21.5,10" stroke="#F5C842" stroke-width="1.4" stroke-linecap="round" fill="rgba(245,200,66,0.05)"/>
+          <line x1="9.5" y1="20" x2="14.5" y2="20" stroke="#F5C842" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="feat-title">AI-Powered Insights</div>
+      <p class="feat-desc">
+        Automatic transaction categorization and subscription tracking.
+        Get smart spending insights and budget recommendations powered by AI.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+  <div class="cta-inner">
+    <div class="section-eyebrow" data-reveal>Get Started Today</div>
+    <h2 class="cta-title" data-reveal>Ready to master<br/>your finances?</h2>
+    <p class="cta-sub" data-reveal>Built for students in Germany who want secure bank connectivity, smart insights, and full control over their budget.</p>
+    <div class="cta-btns" data-reveal>
+      <a href="/login" class="btn-primary btn-lg">Get Started Free →</a>
+      <a href="#features" class="btn-outline">See Features</a>
+    </div>
+    <p class="cta-note" data-reveal>No credit card required · Read-only access · PSD2 compliant</p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <a href="#hero" class="footer-logo">
+    <div class="footer-logo-icon">H</div>
+    <span class="footer-logo-text">Holdwise</span>
+  </a>
+  <span class="footer-copy">© 2026 Holdwise. All rights reserved. Financial data securely processed by Plaid.</span>
+  <nav class="footer-links">
+    <a href="#">Privacy Policy</a>
+    <a href="#">Terms of Service</a>
+    <a href="#">Security</a>
+    <a href="#">Contact</a>
+  </nav>
+</footer>
+
+<!-- Theme toggle -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" fill="rgba(255,255,255,0.85)"/>
+  </svg>
+  <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <circle cx="12" cy="12" r="4.5" fill="#2E75B6"/>
+    <g stroke="#2E75B6" stroke-width="1.8" stroke-linecap="round">
+      <line x1="12" y1="2"   x2="12" y2="4.5"/>
+      <line x1="12" y1="19.5" x2="12" y2="22"/>
+      <line x1="2"  y1="12"  x2="4.5" y2="12"/>
+      <line x1="19.5" y1="12" x2="22" y2="12"/>
+      <line x1="4.93" y1="4.93" x2="6.76" y2="6.76"/>
+      <line x1="17.24" y1="17.24" x2="19.07" y2="19.07"/>
+      <line x1="19.07" y1="4.93" x2="17.24" y2="6.76"/>
+      <line x1="6.76" y1="17.24" x2="4.93" y2="19.07"/>
+    </g>
+  </svg>
+</button>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  /* Auth guard — redirect logged-in users to dashboard */
+  (async function() {
+    try {
+      const sb = window.supabase.createClient(
+        'https://vsmiguhndgjmygbxhage.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzbWlndWhuZGdqbXlnYnhoYWdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MDY2NTYsImV4cCI6MjA5MDM4MjY1Nn0.xhPxYmIxBdJu856e63WQna_fQTC1FRqILZcuctemIpo'
+      );
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) { navigateTo('/dashboard'); return; }
+    } catch(e) {}
+    document.body.classList.add('loaded');
+  })();
+
+  /* Smooth navigation */
+  function navigateTo(url) {
+    document.body.classList.add('fade-out');
+    setTimeout(() => { window.location.href = url; }, 250);
+  }
+  document.querySelectorAll('a[href="/login"]').forEach(a => {
+    a.addEventListener('click', e => { e.preventDefault(); navigateTo('/login'); });
+  });
+
+  /* Theme */
+  (function() {
+    const body = document.body;
+    const btn  = document.getElementById('themeToggle');
+    const STORAGE = 'holdwise-theme';
+
+    function apply(theme) {
+      body.classList.toggle('light', theme === 'light');
+    }
+
+    const stored = localStorage.getItem(STORAGE);
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    apply(stored ?? (prefersDark ? 'dark' : 'light'));
+
+    btn.addEventListener('click', () => {
+      const next = body.classList.contains('light') ? 'dark' : 'light';
+      apply(next);
+      localStorage.setItem(STORAGE, next);
+    });
+  })();
+
+  /* Scroll reveal */
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
+
+  /* Spotlight cards */
+  const glowCards = document.querySelectorAll('.glow-card');
+  document.addEventListener('pointermove', e => {
+    glowCards.forEach(card => {
+      card.style.setProperty('--x', e.clientX);
+      card.style.setProperty('--y', e.clientY);
+    });
+  });
+</script>
+
+</body>
+</html>
