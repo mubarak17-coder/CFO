@@ -117,6 +117,49 @@
     }
     .signup-only.visible { max-height: 120px; opacity: 1; margin-bottom: 14px; }
 
+    /* OTP screen */
+    #otp-screen { display: none; }
+    #otp-screen.visible { display: block; }
+    #credentials-screen.hidden { display: none; }
+
+    .otp-header { text-align: center; margin-bottom: 28px; }
+    .otp-header .otp-icon {
+      width: 52px; height: 52px; margin: 0 auto 14px;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+    .otp-header h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .otp-header p { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+    .otp-header p span { color: var(--text); font-weight: 600; }
+
+    .otp-inputs {
+      display: flex; gap: 10px; justify-content: center;
+      margin-bottom: 20px;
+    }
+    .otp-inputs input {
+      width: 46px; height: 54px;
+      background: var(--bg-card-2); border: 2px solid transparent;
+      border-radius: 12px; color: var(--text);
+      font-size: 22px; font-weight: 700; font-family: inherit;
+      text-align: center; outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      caret-color: transparent;
+    }
+    .otp-inputs input:focus { border-color: var(--accent-2); background: rgba(255,255,255,0.07); }
+    .otp-inputs input.filled { border-color: rgba(0,212,255,0.3); }
+
+    .otp-actions { text-align: center; margin-top: 16px; }
+    .otp-actions button {
+      background: none; border: none; cursor: pointer;
+      font-family: inherit; font-size: 13px;
+      color: var(--text-muted); transition: color 0.2s;
+    }
+    .otp-actions button:hover:not(:disabled) { color: var(--accent-2); }
+    .otp-actions button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .otp-actions .back-btn { display: block; margin-top: 10px; }
+
     .toast-container { position: fixed; top: 24px; right: 24px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; }
     .toast { padding: 13px 18px; border-radius: 12px; font-size: 13px; font-weight: 500; backdrop-filter: blur(20px); animation: toastIn 0.35s ease both; max-width: 320px; }
     .toast.error { background: rgba(255,67,58,0.15); border: 1px solid rgba(255,67,58,0.25); color: #FF453A; }
@@ -134,50 +177,159 @@
         <div class="logo-icon">H</div>
         <span class="logo-text">Holdwise</span>
       </a>
-      <div class="tabs">
-        <button class="tab active" id="tab-login" onclick="switchTab('login')">Log In</button>
-        <button class="tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+
+      <!-- Step 1: Email + Password -->
+      <div id="credentials-screen">
+        <div class="tabs">
+          <button class="tab active" id="tab-login" onclick="switchTab('login')">Log In</button>
+          <button class="tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+        </div>
+        <form id="auth-form" onsubmit="handleAuth(event)">
+          <div class="form-group signup-only" id="name-group">
+            <label for="fullname">Full Name</label>
+            <input type="text" id="fullname" placeholder="John Doe" />
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="you@example.com" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="••••••••" required minlength="6" />
+          </div>
+          <div class="form-group signup-only" id="confirm-group">
+            <label for="password-confirm">Confirm Password</label>
+            <input type="password" id="password-confirm" placeholder="••••••••" minlength="6" />
+          </div>
+          <button type="submit" class="btn-submit" id="submit-btn">Log In</button>
+        </form>
+        <a href="/" class="back-link">← Back to homepage</a>
       </div>
-      <form id="auth-form" onsubmit="handleAuth(event)">
-        <div class="form-group signup-only" id="name-group">
-          <label for="fullname">Full Name</label>
-          <input type="text" id="fullname" placeholder="John Doe" />
+
+      <!-- Step 2: OTP verification -->
+      <div id="otp-screen">
+        <div class="otp-header">
+          <div class="otp-icon">✉️</div>
+          <h2>Check your email</h2>
+          <p>We sent a 6-digit code to<br><span id="otp-email-display"></span></p>
         </div>
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" placeholder="you@example.com" required />
+        <form id="otp-form" onsubmit="handleOtp(event)">
+          <div class="otp-inputs" id="otp-inputs">
+            <input type="text" inputmode="numeric" maxlength="1" />
+            <input type="text" inputmode="numeric" maxlength="1" />
+            <input type="text" inputmode="numeric" maxlength="1" />
+            <input type="text" inputmode="numeric" maxlength="1" />
+            <input type="text" inputmode="numeric" maxlength="1" />
+            <input type="text" inputmode="numeric" maxlength="1" />
+          </div>
+          <button type="submit" class="btn-submit" id="otp-submit-btn">Verify</button>
+        </form>
+        <div class="otp-actions">
+          <button id="resend-btn" onclick="handleResend()" disabled>
+            Resend code (<span id="countdown">60</span>s)
+          </button>
+          <button class="back-btn" onclick="showCredentials()">← Back</button>
         </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" placeholder="••••••••" required minlength="6" />
-        </div>
-        <div class="form-group signup-only" id="confirm-group">
-          <label for="password-confirm">Confirm Password</label>
-          <input type="password" id="password-confirm" placeholder="••••••••" minlength="6" />
-        </div>
-        <button type="submit" class="btn-submit" id="submit-btn">Log In</button>
-      </form>
-      <a href="/" class="back-link">← Back to homepage</a>
+      </div>
+
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     let mode = 'login';
+    let otpEmail = '';
+    let countdownTimer = null;
+
     const SUPABASE_URL = 'https://vsmiguhndgjmygbxhage.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzbWlndWhuZGdqbXlnYnhoYWdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MDY2NTYsImV4cCI6MjA5MDM4MjY1Nn0.xhPxYmIxBdJu856e63WQna_fQTC1FRqILZcuctemIpo';
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     (async function() {
       const { data: { session } } = await sb.auth.getSession();
-      if (session) { navigateTo('/dashboard'); return; }
+      if (session) { navigateTo('/dashboard.html'); return; }
       document.body.classList.add('loaded');
     })();
+
+    // OTP input keyboard handling
+    document.addEventListener('DOMContentLoaded', () => {
+      const inputs = document.querySelectorAll('#otp-inputs input');
+      inputs.forEach((input, i) => {
+        input.addEventListener('input', (e) => {
+          const val = e.target.value.replace(/\D/g, '');
+          e.target.value = val ? val[0] : '';
+          e.target.classList.toggle('filled', !!e.target.value);
+          if (val && i < inputs.length - 1) inputs[i + 1].focus();
+        });
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Backspace' && !input.value && i > 0) {
+            inputs[i - 1].value = '';
+            inputs[i - 1].classList.remove('filled');
+            inputs[i - 1].focus();
+          }
+        });
+        input.addEventListener('paste', (e) => {
+          e.preventDefault();
+          const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+          [...pasted].forEach((char, j) => {
+            if (inputs[j]) {
+              inputs[j].value = char;
+              inputs[j].classList.add('filled');
+            }
+          });
+          const next = inputs[Math.min(pasted.length, inputs.length - 1)];
+          if (next) next.focus();
+        });
+      });
+    });
+
+    function getOtpValue() {
+      return [...document.querySelectorAll('#otp-inputs input')].map(i => i.value).join('');
+    }
+
+    function clearOtpInputs() {
+      document.querySelectorAll('#otp-inputs input').forEach(i => { i.value = ''; i.classList.remove('filled'); });
+    }
+
+    function showOtpScreen(email) {
+      otpEmail = email;
+      document.getElementById('otp-email-display').textContent = email;
+      document.getElementById('credentials-screen').classList.add('hidden');
+      document.getElementById('otp-screen').classList.add('visible');
+      setTimeout(() => document.querySelector('#otp-inputs input').focus(), 50);
+      startCountdown(60);
+    }
+
+    function showCredentials() {
+      clearOtpInputs();
+      if (countdownTimer) clearInterval(countdownTimer);
+      document.getElementById('otp-screen').classList.remove('visible');
+      document.getElementById('credentials-screen').classList.remove('hidden');
+    }
+
+    function startCountdown(seconds) {
+      if (countdownTimer) clearInterval(countdownTimer);
+      let remaining = seconds;
+      const btn = document.getElementById('resend-btn');
+      const span = document.getElementById('countdown');
+      btn.disabled = true;
+      span.textContent = remaining;
+      countdownTimer = setInterval(() => {
+        remaining--;
+        span.textContent = remaining;
+        if (remaining <= 0) {
+          clearInterval(countdownTimer);
+          btn.disabled = false;
+          btn.textContent = 'Resend code';
+        }
+      }, 1000);
+    }
 
     function navigateTo(url) {
       document.body.classList.add('fade-out');
       setTimeout(() => { window.location.href = url; }, 220);
     }
+
     function showToast(msg, type) {
       const c = document.getElementById('toast-container');
       const t = document.createElement('div');
@@ -186,6 +338,7 @@
       c.appendChild(t);
       setTimeout(() => { t.classList.add('fade-out'); setTimeout(() => t.remove(), 300); }, 4000);
     }
+
     function switchTab(tab) {
       mode = tab;
       document.getElementById('tab-login').classList.toggle('active', tab === 'login');
@@ -195,48 +348,108 @@
       document.getElementById('fullname').required = tab === 'signup';
       document.getElementById('password-confirm').required = tab === 'signup';
     }
+
     async function handleAuth(e) {
       e.preventDefault();
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
       const btn = document.getElementById('submit-btn');
+
       if (mode === 'signup') {
         const fullname = document.getElementById('fullname').value.trim();
         const confirmPw = document.getElementById('password-confirm').value;
         if (!fullname) { showToast('Please enter your name.', 'error'); return; }
         if (password !== confirmPw) { showToast('Passwords do not match.', 'error'); return; }
       }
+
       btn.disabled = true;
       btn.textContent = mode === 'login' ? 'Logging in...' : 'Creating account...';
+
       try {
-        let result;
         if (mode === 'login') {
-          result = await sb.auth.signInWithPassword({ email, password });
+          // Verify credentials
+          const { error } = await sb.auth.signInWithPassword({ email, password });
+          if (error) { showToast(error.message, 'error'); return; }
+
+          // Sign out immediately — require OTP to complete login
+          await sb.auth.signOut();
+
+          // Send OTP
+          const { error: otpErr } = await sb.auth.signInWithOtp({
+            email,
+            options: { shouldCreateUser: false }
+          });
+          if (otpErr) { showToast(otpErr.message, 'error'); return; }
+
+          showOtpScreen(email);
+          showToast('Code sent to ' + email, 'success');
         } else {
           const fullname = document.getElementById('fullname').value.trim();
-          result = await sb.auth.signUp({ email, password, options: { data: { full_name: fullname } } });
-        }
-        if (result.error) {
-          showToast(result.error.message, 'error');
-        } else if (mode === 'signup') {
-          if (result.data?.user?.identities?.length === 0) {
+          const result = await sb.auth.signUp({ email, password, options: { data: { full_name: fullname } } });
+          if (result.error) {
+            showToast(result.error.message, 'error');
+          } else if (result.data?.user?.identities?.length === 0) {
             showToast('This email is already registered. Try logging in.', 'error');
           } else if (result.data?.user && !result.data?.session) {
             showToast('Account created! Check your email to verify, then log in.', 'success');
             switchTab('login');
           } else if (result.data?.session) {
             showToast('Account created! Redirecting...', 'success');
-            setTimeout(() => navigateTo('/dashboard'), 600);
+            setTimeout(() => navigateTo('/dashboard.html'), 600);
           }
-        } else {
-          showToast('Logged in! Redirecting...', 'success');
-          setTimeout(() => navigateTo('/dashboard'), 600);
         }
       } catch {
         showToast('Something went wrong. Please try again.', 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = mode === 'login' ? 'Log In' : 'Create Account';
+      }
+    }
+
+    async function handleOtp(e) {
+      e.preventDefault();
+      const token = getOtpValue();
+      if (token.length !== 6) { showToast('Enter the full 6-digit code.', 'error'); return; }
+
+      const btn = document.getElementById('otp-submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Verifying...';
+
+      try {
+        const { error } = await sb.auth.verifyOtp({ email: otpEmail, token, type: 'email' });
+        if (error) {
+          showToast(error.message || 'Invalid code. Try again.', 'error');
+          clearOtpInputs();
+          document.querySelector('#otp-inputs input').focus();
+        } else {
+          showToast('Logged in! Redirecting...', 'success');
+          setTimeout(() => navigateTo('/dashboard.html'), 600);
+        }
+      } catch {
+        showToast('Something went wrong. Please try again.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Verify';
+      }
+    }
+
+    async function handleResend() {
+      const btn = document.getElementById('resend-btn');
+      btn.disabled = true;
+      try {
+        const { error } = await sb.auth.signInWithOtp({
+          email: otpEmail,
+          options: { shouldCreateUser: false }
+        });
+        if (error) { showToast(error.message, 'error'); btn.disabled = false; return; }
+        showToast('New code sent!', 'success');
+        clearOtpInputs();
+        document.querySelector('#otp-inputs input').focus();
+        btn.innerHTML = 'Resend code (<span id="countdown">60</span>s)';
+        startCountdown(60);
+      } catch {
+        showToast('Failed to resend code.', 'error');
+        btn.disabled = false;
       }
     }
   </script>
