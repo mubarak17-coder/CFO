@@ -253,5 +253,25 @@ app.get('/api/transactions', requireAuth, async (req, res) => {
   }
 });
 
+app.delete('/api/delete-account', requireAuth, async (req, res) => {
+  const userId = req.user.id;
+  try {
+    // Delete Plaid items (access tokens) first
+    await supabase.from('plaid_items').delete().eq('user_id', userId);
+
+    // Delete the auth user via admin API
+    const { error } = await supabase.auth.admin.deleteUser(userId);
+    if (error) {
+      console.error('Delete user error:', error);
+      return res.status(500).json({ error: 'Failed to delete account' });
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Delete account error:', err);
+    res.status(500).json({ error: 'Failed to delete account' });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT);
